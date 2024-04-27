@@ -13,6 +13,7 @@ import { SessionModule } from '../session/session.module';
 import { TariffsModule } from '../tariffs/tariffs.module';
 import { userExtractor } from '../user/utils/userExtractor.utils';
 import { OrderModule } from '../order/order.module';
+import { SittersModule } from '../sitters/sitters.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { OrderModule } from '../order/order.module';
     TypeOrmModule,
     PetModule,
     TariffsModule,
-    OrderModule
+    OrderModule,
+    SittersModule
   ],
   providers: [],
   controllers: []

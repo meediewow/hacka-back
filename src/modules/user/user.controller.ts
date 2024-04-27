@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags, ApiParam, ApiResponse } from '@nestjs/swagger';
 
 import {
   AuthRequestDto,
@@ -40,7 +40,4 @@ export class UserController {
   public async registration(@Body() body: RegisterRequestDto) {
     return await this.userService.createUser(body);
   }
-
-  // TODO: Пока не делаем
-  public logout() {}
 }

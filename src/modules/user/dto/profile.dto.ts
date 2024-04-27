@@ -21,6 +21,11 @@ export class ProfileDto implements IUserProfile {
   @ApiProperty({ type: 'string', example: 'Homer' })
   public name: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty({ type: 'string', example: 'https://btc.com', required: false })
+  public photo?: string;
+
   @IsOptional()
   @ApiProperty({ type: AddressDto, required: false })
   public address?: AddressDto;
