@@ -7,7 +7,8 @@ import { PetModule } from '../pet/pet.module';
 
 import { OrderEntity } from './entities/order.entity';
 import { OrderService } from './order.service';
-import { OrderController } from './order.controller';
+import { SitterOrderController } from './sitter-order.controller';
+import { ClientOrderController } from './client-order.controller';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { OrderController } from './order.controller';
     PetModule
   ],
   providers: [OrderService],
-  controllers: [OrderController],
+  controllers: [SitterOrderController, ClientOrderController],
   exports: [OrderService]
 })
 export class OrderModule {}

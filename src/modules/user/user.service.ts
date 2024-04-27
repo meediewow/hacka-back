@@ -70,7 +70,7 @@ export class UserService {
       where = identifier ? { identifier } : null;
     }
 
-    return await this.userRepository.findOne({ where });
+    return this.userRepository.findOne({ where });
   }
 
   public async createUser(data: RegisterRequestDto) {

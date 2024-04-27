@@ -26,7 +26,6 @@ export class OrderRequestDto implements Partial<OrderEntity> {
     isArray: true,
     example: ['616f9b3b8f4b3b001f3b3b3b']
   })
-  @IsObject({ each: true })
   @Transform(({ value }) => value.map((i) => ObjectId.createFromHexString(i)))
   petIds: ObjectId[];
 }

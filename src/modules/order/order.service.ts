@@ -26,6 +26,26 @@ export class OrderService {
   @Inject(PetService)
   private petService!: PetService;
 
+  async getSitterOrders(): Promise<OrderEntity[]> {
+    const user = this.userAls.getStore().user;
+
+    return this.orderRepository.find({
+      where: {
+        sitterId: user._id
+      }
+    });
+  }
+
+  async getClientOrders(): Promise<OrderEntity[]> {
+    const user = this.userAls.getStore().user;
+
+    return this.orderRepository.find({
+      where: {
+        clientId: user._id
+      }
+    });
+  }
+
   async changeSitterStatus(
     args: ChangeOrderStatusRequestDto
   ): Promise<OrderEntity> {
@@ -41,7 +61,7 @@ export class OrderService {
       order.status
     ]?.includes(args.status);
 
-    if (order.sitterId.equals(sitter._id) || isSelectedCorrectStatus) {
+    if (!order.sitterId.equals(sitter._id) || !isSelectedCorrectStatus) {
       throw new ForbiddenException();
     }
 
@@ -65,7 +85,7 @@ export class OrderService {
       order.status
     ]?.includes(args.status);
 
-    if (order.clientId.equals(client._id) || isSelectedCorrectStatus) {
+    if (!order.clientId.equals(client._id) || !isSelectedCorrectStatus) {
       throw new ForbiddenException();
     }
 

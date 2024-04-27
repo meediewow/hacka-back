@@ -1,37 +1,36 @@
 import { Body, Controller, Inject } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { GuardPost } from '../user/decorators';
+import { GuardGet, GuardPost } from '../user/decorators';
 import { UserRole } from '../user/types/user.types';
 
 import { OrderService } from './order.service';
 import { OrderRequestDto, OrderResponseDto } from './dto/order.dto';
 import { ChangeOrderStatusRequestDto } from './dto/change-order-status.dto';
 
-@ApiTags('Sitter order')
-@Controller('sitter-order')
-export class OrderController {
+@ApiTags('Client order')
+@Controller('client-order')
+export class ClientOrderController {
   @Inject(OrderService)
   private readonly orderService: OrderService;
 
-  @GuardPost([UserRole.Client])
+  @GuardPost([UserRole.Client], 'create')
   @ApiBody({ type: OrderRequestDto })
   @ApiResponse({ type: OrderResponseDto })
-  public async auth(@Body() body: OrderRequestDto) {
+  public async createOrder(@Body() body: OrderRequestDto) {
     return this.orderService.createOrder(body);
   }
 
-  @GuardPost([UserRole.Sitter], 'change-sitter-status')
-  @ApiBody({ type: ChangeOrderStatusRequestDto })
-  @ApiResponse({ type: OrderResponseDto })
-  public async changeSitterStatus(@Body() body: ChangeOrderStatusRequestDto) {
-    return this.orderService.changeSitterStatus(body);
-  }
-
-  @GuardPost([UserRole.Client], 'change-client-status')
+  @GuardPost([UserRole.Client], 'change-status')
   @ApiBody({ type: ChangeOrderStatusRequestDto })
   @ApiResponse({ type: OrderResponseDto })
   public async changeClientStatus(@Body() body: ChangeOrderStatusRequestDto) {
     return this.orderService.changeClientStatus(body);
+  }
+
+  @GuardGet([UserRole.Client])
+  @ApiResponse({ type: OrderResponseDto, isArray: true })
+  public async getClientOrders() {
+    return this.orderService.getClientOrders();
   }
 }
