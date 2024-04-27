@@ -26,6 +26,10 @@ export class UserService {
   @Inject(PetService)
   private petService!: PetService;
 
+  public getRepository(): MongoRepository<UserEntity> {
+    return this.userRepository;
+  }
+
   public async getMeUser() {
     const user = this.als.getStore().user as UserEntity;
 

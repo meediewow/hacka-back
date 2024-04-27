@@ -9,8 +9,8 @@ import { SuccessDto } from '../../network/dto/success.dto';
 import { TariffsService } from './tariffs.service';
 import { TariffsListResponseDto } from './dto/tariff.dto';
 
-@ApiTags('tariffs')
-@Controller('tariffs' + '')
+@ApiTags('Tariffs')
+@Controller('tariffs')
 export class TariffsController {
   constructor(private tariffService: TariffsService) {}
 
