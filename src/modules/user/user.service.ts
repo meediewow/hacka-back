@@ -18,8 +18,10 @@ import { UserEntity } from './entities';
 import { RegisterRequestDto, UserDto } from './dto';
 import { IFindUserData } from './types/common.types';
 import { ITokenContainer } from './types/token.types';
+import { UserUpdateRequestDto } from './dto/user.dto';
 import { createTokenForUser } from './decorators/auth/utils';
 import { IUserAuthData, UserRole } from './types/user.types';
+import { userMutationMerge } from './utils/userMerge.utils';
 
 @Injectable()
 export class UserService {
@@ -103,6 +105,7 @@ export class UserService {
 
     userEntity.rate = 0;
     userEntity.profile = data.profile;
+    userEntity.about = data.about ?? '';
     userEntity.identifier = data.identifier;
     userEntity.roles = [data.role ?? UserRole.Client];
     userEntity.password = passwordHash;
@@ -129,6 +132,14 @@ export class UserService {
     user.rate = user.rate ? (user.rate + rating) / 2 : rating;
     await this.addOrdersCountToUser(user);
     await this.userRepository.save(user);
+  }
+
+  public async updateUserSafe(data: UserUpdateRequestDto) {
+    const { user } = this.als.getStore();
+    const updatedUser = userMutationMerge(user, data);
+    const result = await this.userRepository.save(updatedUser);
+
+    return UserDto.fromEntity(result);
   }
 
   private async addOrdersCountToUser(user: UserEntity) {

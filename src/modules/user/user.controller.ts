@@ -7,9 +7,10 @@ import {
   TokenResponseDto,
   UserDto
 } from './dto';
-import { GuardGet } from './decorators';
+import { GuardGet, GuardPost } from './decorators';
 import { UserService } from './user.service';
 import { UserRole } from './types/user.types';
+import { UserUpdateRequestDto } from './dto/user.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -45,5 +46,12 @@ export class UserController {
   @ApiResponse({ type: TokenResponseDto })
   public async registration(@Body() body: RegisterRequestDto) {
     return await this.userService.createUser(body);
+  }
+
+  @GuardPost([UserRole.Client, UserRole.Sitter], 'update')
+  @ApiBody({ type: UserUpdateRequestDto })
+  @ApiResponse({ type: UserDto })
+  public async update(@Body() body: UserUpdateRequestDto) {
+    return await this.userService.updateUserSafe(body);
   }
 }
