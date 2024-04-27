@@ -8,6 +8,7 @@ import { UserModule } from '../user/user.module';
 import { AlsModule } from '../../als/als.module';
 import { UserService } from '../user/user.service';
 import { UploadModule } from '../upload/upload.module';
+import { PetModule } from '../pet/pet.module';
 import { SessionModule } from '../session/session.module';
 import { userExtractor } from '../user/utils/userExtractor.utils';
 
@@ -18,7 +19,8 @@ import { userExtractor } from '../user/utils/userExtractor.utils';
     UserModule,
     UploadModule,
     SessionModule,
-    TypeOrmModule
+    TypeOrmModule,
+    PetModule
   ],
   providers: [],
   controllers: []
