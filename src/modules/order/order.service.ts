@@ -3,7 +3,9 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
   Inject,
+  Injectable,
   NotFoundException
 } from '@nestjs/common';
 import { DateTime } from 'luxon';
@@ -19,12 +21,14 @@ import { OrderRequestDto, OrderResponseDto } from './dto/order.dto';
 import { Status } from './enums/status.enum';
 import { ChangeOrderStatusRequestDto } from './dto/change-order-status.dto';
 import { OrderRepository } from './order.repository';
+import { PayDto } from './dto/pay.dto';
 
+@Injectable()
 export class OrderService {
   @Inject(AsyncLocalStorage)
   private readonly userAls!: AsyncLocalStorage<{ user: UserEntity }>;
 
-  @Inject(UserService)
+  @Inject(forwardRef(() => UserService))
   private userService!: UserService;
 
   @Inject(PetService)
@@ -32,6 +36,33 @@ export class OrderService {
 
   @Inject(OrderRepository)
   private orderRepository!: OrderRepository;
+
+  async getOrdersCount(userId: UserEntity['_id']): Promise<number> {
+    return this.orderRepository.count({
+      where: {
+        $or: [{ clientId: userId }, { sitterId: userId }]
+      }
+    });
+  }
+
+  async pay(args: PayDto): Promise<OrderResponseDto> {
+    const order = await this.orderRepository.findOneOrFail({
+      where: { _id: args.orderId }
+    });
+    if (order.isPayed || order.status !== Status.PROGRESS) {
+      throw new BadRequestException('Order already payed or canceled');
+    }
+
+    order.isPayed = true;
+    await this.orderRepository.save(order);
+
+    return {
+      ...order,
+      sitter: UserDto.fromEntity(this.userAls.getStore().user),
+      client: await this.userService.findUser({ id: order.clientId }),
+      pets: await this.petService.getPetsByIds(order.petIds)
+    };
+  }
 
   async getSitterOrderById(id: string): Promise<OrderResponseDto> {
     const result = await this.orderRepository.getFullOrderById(
@@ -96,7 +127,11 @@ export class OrderService {
   ): Promise<OrderResponseDto> {
     const sitter = this.userAls.getStore().user;
 
-    const order = await this.findOrderOrFail(args.orderId);
+    const order = await this.orderRepository.findOneOrFail({
+      where: {
+        _id: args.orderId
+      }
+    });
 
     const ALLOWED_STATUSES_MAP = {
       [Status.NEW]: [Status.CONFIRMED, Status.CANCELED]
@@ -113,10 +148,11 @@ export class OrderService {
     order.status = args.status;
     const updatedOrder = await this.orderRepository.save(order);
     const client = await this.userService.findUser({ id: order.clientId });
+
     return {
       ...updatedOrder,
       sitter: UserDto.fromEntity(sitter),
-      client: UserDto.fromEntity(client),
+      client,
       pets: await this.petService.getPetsByIds(updatedOrder.petIds)
     };
   }
@@ -126,7 +162,11 @@ export class OrderService {
   ): Promise<OrderResponseDto> {
     const client = this.userAls.getStore().user;
 
-    const order = await this.findOrderOrFail(args.orderId);
+    const order = await this.orderRepository.findOneOrFail({
+      where: {
+        _id: args.orderId
+      }
+    });
 
     const ALLOWED_STATUSES_MAP = {
       [Status.CONFIRMED]: [Status.PROGRESS],
@@ -147,7 +187,7 @@ export class OrderService {
 
     return {
       ...updatedOrder,
-      sitter: UserDto.fromEntity(sitter),
+      sitter,
       client: UserDto.fromEntity(client),
       pets: await this.petService.getPetsByIds(updatedOrder.petIds)
     };
@@ -183,7 +223,7 @@ export class OrderService {
       pets.find((pet) => pet.type === tariff.category)
     );
 
-    const dayPriceBySelectedTariffs = Number(
+    const dailyPrice = Number(
       selectedTariffs
         .map((tariff) => tariff.pricePerDay)
         .reduce((a, b) => a + b, 0)
@@ -197,23 +237,15 @@ export class OrderService {
         ...data,
         clientId: client.user._id,
         status: Status.NEW,
-        price: dayPriceBySelectedTariffs * daysCount,
+        price: dailyPrice * daysCount,
         isPayed: false
       })
     );
     return {
       ...order,
       client: UserDto.fromEntity(client.user),
-      sitter: UserDto.fromEntity(sitter),
+      sitter,
       pets
     };
-  }
-
-  findOrderOrFail(_id: OrderEntity['_id']): Promise<OrderEntity> {
-    return this.orderRepository.findOneOrFail({
-      where: {
-        _id
-      }
-    });
   }
 }

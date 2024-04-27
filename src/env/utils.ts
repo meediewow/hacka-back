@@ -1,5 +1,5 @@
 import { defaultEnvVariables } from './constants';
-import { TypeMappers, EnvVariablesKey, EnvVariablesMap } from './types';
+import { EnvVariablesKey, EnvVariablesMap, TypeMappers } from './types';
 
 const typeMappers: TypeMappers = {
   JWT_SECRET: (value: string) => value,
@@ -8,7 +8,8 @@ const typeMappers: TypeMappers = {
   MONGO_URL: (value) => value,
   AWS_ACCESS_KEY_ID: (value) => value,
   AWS_SECRET_ACCESS_KEY: (value) => value,
-  AWS_REGION: (value) => value
+  AWS_REGION: (value) => value,
+  PASSWORD_SALT: (value) => value
 };
 
 const getTypeMapper = <Key extends EnvVariablesKey>(

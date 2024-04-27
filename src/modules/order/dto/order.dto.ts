@@ -7,6 +7,13 @@ import { OrderEntity } from '../entities/order.entity';
 import { UserDto } from '../../user/dto';
 import { PetResponseDto } from '../../pet/dto/pet.dto';
 
+export class BaseOrderRequest {
+  @IsObject()
+  @ApiProperty({ type: 'string', example: '616f9b3b8f4b3b001f3b3b3b' })
+  @Transform(({ value }) => ObjectId.createFromHexString(value))
+  orderId: ObjectId;
+}
+
 export class OrderRequestDto implements Partial<OrderEntity> {
   @ApiProperty({ type: 'string', example: '616f9b3b8f4b3b001f3b3b3b' })
   @IsObject()

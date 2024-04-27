@@ -5,20 +5,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, MongoRepository } from 'typeorm';
 import {
   BadRequestException,
+  forwardRef,
   Inject,
-  Injectable,
-  NotFoundException
+  Injectable
 } from '@nestjs/common';
 
 import { encryptPassword } from '../../crypto';
 import { PetService } from '../pet/pet.service';
+import { OrderService } from '../order/order.service';
 
 import { UserEntity } from './entities';
-import { RegisterRequestDto } from './dto';
+import { RegisterRequestDto, UserDto } from './dto';
 import { IFindUserData } from './types/common.types';
 import { ITokenContainer } from './types/token.types';
 import { createTokenForUser } from './decorators/auth/utils';
-import { IUserAuthData, IUserLight, UserRole } from './types/user.types';
+import { IUserAuthData, UserRole } from './types/user.types';
 
 @Injectable()
 export class UserService {
@@ -26,44 +27,37 @@ export class UserService {
   private userRepository!: MongoRepository<UserEntity>;
 
   @Inject(AsyncLocalStorage)
-  private readonly als: AsyncLocalStorage<any>;
+  private readonly als: AsyncLocalStorage<{ user: UserEntity }>;
 
   @Inject(PetService)
   private petService!: PetService;
+
+  @Inject(forwardRef(() => OrderService))
+  private orderService!: OrderService;
 
   public getRepository(): MongoRepository<UserEntity> {
     return this.userRepository;
   }
 
-  public async getOneUser(userId: string) {
-    const _id = ObjectId.createFromHexString(userId);
-    const result = await this.userRepository.findOne({ where: { _id } });
+  public async findByIdOrFail(_id: UserEntity['_id'] | string) {
+    const id =
+      typeof _id === 'string' ? ObjectId.createFromHexString(_id) : _id;
 
-    if (!result) {
-      throw new NotFoundException('User not found');
-    }
-
-    return result;
+    return this.userRepository.findOneOrFail({
+      where: { _id: id }
+    });
   }
 
   public async getMeUser() {
-    const user = this.als.getStore().user as UserEntity;
-
+    const user = this.als.getStore().user;
     const pets = await this.petService.getPets(user);
-
-    const result: IUserLight = {
-      _id: user._id,
-      pets: pets ?? [],
-      roles: user.roles,
-      rate: user.rate ?? 0,
-      profile: user.profile
-    };
-
-    return result;
+    return UserDto.fromEntity({ ...user, pets });
   }
 
   public async authUser(data: IUserAuthData): Promise<ITokenContainer> {
-    const user = await this.findUser({ identifier: data.identifier });
+    const user = await this.userRepository.findOneOrFail({
+      where: { identifier: data.identifier }
+    });
 
     if (!user) {
       throw new BadRequestException('User is not exists');
@@ -91,7 +85,9 @@ export class UserService {
       where = identifier ? { identifier } : null;
     }
 
-    return this.userRepository.findOne({ where });
+    const user = await this.userRepository.findOne({ where });
+    await this.addOrdersCountToUser(user);
+    return UserDto.fromEntity(user);
   }
 
   public async createUser(data: RegisterRequestDto) {
@@ -109,7 +105,6 @@ export class UserService {
     userEntity.profile = data.profile;
     userEntity.identifier = data.identifier;
     userEntity.roles = [data.role ?? UserRole.Client];
-
     userEntity.password = passwordHash;
 
     const savedUser = await this.userRepository.save(userEntity);
@@ -128,20 +123,20 @@ export class UserService {
     await this.userRepository.save(user);
   }
 
+  public async updateUserRating(_id: ObjectId, rating: number) {
+    const user = await this.findByIdOrFail(_id);
+
+    user.rate = user.rate ? (user.rate + rating) / 2 : rating;
+    await this.addOrdersCountToUser(user);
+    await this.userRepository.save(user);
+  }
+
+  private async addOrdersCountToUser(user: UserEntity) {
+    user.profile.ordersCount = await this.orderService.getOrdersCount(user._id);
+  }
+
   private async isUserExists(data: IFindUserData) {
     const user = await this.findUser(data);
     return !!user;
-  }
-
-  public async updateUserRating(_id: ObjectId, rating: number) {
-    const user = await this.userRepository.findOne({ where: { _id } });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    user.rate = user.rate ? (user.rate + rating) / 2 : rating;
-
-    await this.userRepository.save(user);
   }
 }

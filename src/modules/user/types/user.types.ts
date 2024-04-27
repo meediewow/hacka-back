@@ -32,6 +32,8 @@ export interface IUserProfile {
   communication?: IUserCommunicationData;
 
   tariff?: ITariff[];
+
+  ordersCount?: number;
 }
 
 export interface IUser extends IUserAuthData {

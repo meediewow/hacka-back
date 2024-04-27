@@ -27,7 +27,7 @@ export class OrderRepository extends MongoRepository<OrderEntity> {
           _id: id
         }
       },
-      ...this.lookupSitterAndClient()
+      ...this.getLookupSitterAndClientStages()
     ]).next();
     return cursor as Promise<
       OrderEntity & {
@@ -45,7 +45,7 @@ export class OrderRepository extends MongoRepository<OrderEntity> {
           sitterId
         }
       },
-      ...this.lookupSitterAndClient(),
+      ...this.getLookupSitterAndClientStages(),
       {
         $sort: {
           _id: -1
@@ -77,7 +77,7 @@ export class OrderRepository extends MongoRepository<OrderEntity> {
           clientId
         }
       },
-      ...this.lookupSitterAndClient(),
+      ...this.getLookupSitterAndClientStages(),
       {
         $sort: {
           _id: -1
@@ -94,7 +94,7 @@ export class OrderRepository extends MongoRepository<OrderEntity> {
     >;
   }
 
-  private lookupSitterAndClient() {
+  private getLookupSitterAndClientStages() {
     return [
       {
         $lookup: {

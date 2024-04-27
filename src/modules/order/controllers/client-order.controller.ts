@@ -1,12 +1,11 @@
 import { Body, Controller, Inject, Param } from '@nestjs/common';
 import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { GuardGet, GuardPost } from '../user/decorators';
-import { UserRole } from '../user/types/user.types';
-
-import { OrderService } from './order.service';
-import { OrderRequestDto, OrderResponseDto } from './dto/order.dto';
-import { ChangeOrderStatusRequestDto } from './dto/change-order-status.dto';
+import { GuardGet, GuardPost } from '../../user/decorators';
+import { UserRole } from '../../user/types/user.types';
+import { OrderService } from '../order.service';
+import { OrderRequestDto, OrderResponseDto } from '../dto/order.dto';
+import { ChangeOrderStatusRequestDto } from '../dto/change-order-status.dto';
 
 @ApiTags('Client order')
 @Controller('client-order')

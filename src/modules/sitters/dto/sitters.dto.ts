@@ -58,6 +58,20 @@ export class SitterDto {
   @IsNumber()
   @ApiProperty({ type: 'number', example: 10 })
   countOrders: number;
+
+  constructor(data: SitterDto) {
+    this._id = data._id;
+    this.name = data.name;
+    this.rating = data.rating;
+    this.price = data.price;
+    this.photo = data.photo;
+    this.address = data.address;
+    this.countOrders = data.countOrders;
+  }
+
+  static fromEntity(entity: SitterDto) {
+    return new SitterDto(entity);
+  }
 }
 
 export class SittersResponseDto {

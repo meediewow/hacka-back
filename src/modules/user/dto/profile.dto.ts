@@ -30,6 +30,10 @@ export class ProfileDto implements IUserProfile {
   @ApiProperty({ type: AddressDto, required: false })
   public address?: AddressDto;
 
+  @IsOptional()
+  @ApiProperty({ type: 'number', required: false })
+  public ordersCount?: number;
+
   @ApiProperty({ type: CommunicationDto, required: false })
   public communication?: CommunicationDto;
 

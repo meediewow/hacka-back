@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AlsModule } from '../../als/als.module';
@@ -7,15 +7,15 @@ import { PetModule } from '../pet/pet.module';
 
 import { OrderEntity } from './entities/order.entity';
 import { OrderService } from './order.service';
-import { SitterOrderController } from './sitter-order.controller';
-import { ClientOrderController } from './client-order.controller';
+import { SitterOrderController } from './controllers/sitter-order.controller';
+import { ClientOrderController } from './controllers/client-order.controller';
 import { OrderRepository } from './order.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([OrderEntity]),
     AlsModule,
-    UserModule,
+    forwardRef(() => UserModule),
     PetModule
   ],
   providers: [OrderService, OrderRepository],

@@ -24,7 +24,7 @@ export class UserController {
   })
   @ApiResponse({ type: UserDto })
   public async getUser(@Param() { userId }: { userId: string }) {
-    return await this.userService.getOneUser(userId);
+    return await this.userService.findByIdOrFail(userId);
   }
 
   @GuardGet([UserRole.Client, UserRole.Sitter], 'me')
