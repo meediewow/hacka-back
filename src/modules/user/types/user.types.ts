@@ -48,3 +48,7 @@ export interface IUser extends IUserAuthData {
 }
 
 export type IUserLight = Omit<IUser, 'password' | 'identifier'>;
+
+export type IUserUpdateData = Partial<
+  Omit<IUserLight, '_id' | 'pets' | 'rate' | 'roles'>
+>;
