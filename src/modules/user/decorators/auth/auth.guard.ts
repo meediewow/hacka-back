@@ -1,22 +1,31 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+
 import {
-  Get,
-  Post,
-  UseGuards,
-  Injectable,
-  CanActivate,
   applyDecorators,
-  ExecutionContext
+  CanActivate,
+  ExecutionContext,
+  Get,
+  Inject,
+  Injectable,
+  Post,
+  Scope,
+  UseGuards
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { parseBearerToken, validateToken } from './utils';
 
-@Injectable()
+@Injectable({ scope: Scope.DEFAULT })
 export class CheckToken implements CanActivate {
+  @Inject(AsyncLocalStorage)
+  private als: AsyncLocalStorage<any>;
+
   canActivate(context: ExecutionContext): Promise<boolean> | boolean {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
+
+    console.log(this.als.getStore());
 
     const authHeader: string = request.header('authorization');
 
