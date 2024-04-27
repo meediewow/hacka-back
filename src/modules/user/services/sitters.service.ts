@@ -2,18 +2,15 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { UserDto } from '../dto';
 import { SittersRequestDto } from '../dto/sitters.dto';
-
-import { UserService } from './user.service';
+import { UserRepository } from '../user.repository';
 
 @Injectable()
 export class SittersService {
-  @Inject(UserService)
-  private userService: UserService;
+  @Inject(UserRepository)
+  private userRepository: UserRepository;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getSittersList(_: SittersRequestDto) {
-    const repository = this.userService.getRepository();
-    const users = await repository.find();
+  public async getSittersList(args: SittersRequestDto): Promise<UserDto[]> {
+    const users = await this.userRepository.getSittersList(args);
     return users.map(UserDto.fromEntity);
   }
 }

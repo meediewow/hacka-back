@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, MongoRepository } from 'typeorm';
+import { FindOptionsWhere } from 'typeorm';
 import {
   BadRequestException,
   forwardRef,
@@ -20,11 +20,12 @@ import { createTokenForUser } from '../decorators/auth/utils';
 import { IUserAuthData, UserRole } from '../types/user.types';
 import { userMutationMerge } from '../utils/userMerge.utils';
 import { AlsService } from '../../../als/als.service';
+import { UserRepository } from '../user.repository';
 
 @Injectable()
 export class UserService {
-  @InjectRepository(UserEntity)
-  private userRepository!: MongoRepository<UserEntity>;
+  @InjectRepository(UserRepository)
+  private userRepository!: UserRepository;
 
   @Inject(AlsService)
   private readonly userAls: AlsService;
@@ -34,10 +35,6 @@ export class UserService {
 
   @Inject(forwardRef(() => OrderService))
   private orderService!: OrderService;
-
-  public getRepository(): MongoRepository<UserEntity> {
-    return this.userRepository;
-  }
 
   public async findByIdOrFail(_id: UserEntity['_id'] | string) {
     const id =

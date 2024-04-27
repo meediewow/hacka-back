@@ -24,6 +24,18 @@ export class UserEntity implements IUser {
   @Column()
   public profile: IUserProfile;
 
+  @Column({
+    type: 'geometry',
+    spatialFeatureType: 'Point',
+    srid: 4326,
+    nullable: true
+  })
+  @Index({ spatial: true })
+  public location: {
+    type: 'Point';
+    coordinates: number[];
+  } | null;
+
   @Column()
   public rate: number;
 

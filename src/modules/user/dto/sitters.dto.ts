@@ -1,32 +1,35 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested
+} from 'class-validator';
+import { Transform } from 'class-transformer';
 
-export class CoordinatesDto {
-  @IsNumber()
-  @ApiProperty({ type: 'number', example: 0 })
-  public x: number;
-
-  @IsNumber()
-  @ApiProperty({ type: 'number', example: 0 })
-  public y: number;
-}
+import { PeriodDto } from '../../../network/dto/period.dto';
+import { SorterDto } from '../../../network/dto/sorter.dto';
 
 export class SittersRequestDto {
-  @IsNumber()
+  @IsNumber(undefined, { each: true })
   @ApiProperty({ type: 'number', example: 1, isArray: true, required: false })
-  category: number[];
+  category?: number[];
 
-  @IsNumber()
-  @ApiProperty({ type: 'number', example: 0, required: false })
-  dateStart: number;
+  @ApiProperty({ type: PeriodDto, required: false })
+  @IsOptional()
+  @ValidateNested()
+  period?: PeriodDto;
 
-  @IsNumber()
-  @ApiProperty({ type: 'number', example: 0, required: false })
-  dateEnd: number;
+  @ApiProperty({ type: 'number', required: false, isArray: true })
+  @IsOptional()
+  @IsNumber(undefined, { each: true })
+  coordinates?: number[];
 
-  @IsNumber()
-  @ApiProperty({ type: CoordinatesDto, required: false })
-  address: CoordinatesDto;
+  @ApiProperty({ type: SorterDto, required: false })
+  @IsOptional()
+  @ValidateNested()
+  @Transform(({ value }) => new SorterDto(value))
+  sorter?: SorterDto;
 }
 
 export class SitterDto {

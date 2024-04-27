@@ -195,9 +195,10 @@ export class OrderService {
     const client = this.alsService.getStore();
 
     const sitter = await this.userService.findUser({ id: data.sitterId });
+    const { period, ...rest } = data;
 
-    const dayStart = DateTime.fromJSDate(data.dateBegin);
-    const dayEnd = DateTime.fromJSDate(data.dateEnd);
+    const dayStart = DateTime.fromJSDate(period.start);
+    const dayEnd = DateTime.fromJSDate(period.end);
 
     if (dayEnd <= dayStart) {
       throw new BadRequestException('Invalid date range');
@@ -233,7 +234,9 @@ export class OrderService {
 
     const order = await this.orderRepository.save(
       new OrderEntity({
-        ...data,
+        ...rest,
+        startAt: dayStart.toJSDate(),
+        finishAt: dayEnd.toJSDate(),
         clientId: client.user._id,
         status: Status.NEW,
         price: dailyPrice * daysCount,

@@ -10,9 +10,10 @@ import { UserController } from './controllers/user.controller';
 import { UserEntity } from './entities';
 import { SittersService } from './services/sitters.service';
 import { SittersController } from './controllers/sitters.controller';
+import { UserRepository } from './user.repository';
 
 @Module({
-  providers: [UserService, SittersService],
+  providers: [UserService, SittersService, UserRepository],
   controllers: [UserController, SittersController],
   exports: [UserService],
   imports: [

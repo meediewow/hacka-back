@@ -25,6 +25,9 @@ export class UserDto {
   @ApiProperty({ type: ProfileDto, required: false })
   public profile: ProfileDto;
 
+  @ApiProperty({ type: 'number', required: false, isArray: true })
+  public coordinates: number[];
+
   @IsNumber()
   @ApiProperty({ type: 'number' })
   public rate: number;
@@ -54,4 +57,9 @@ export class UserUpdateRequestDto implements IUserUpdateData {
   @IsOptional()
   @ApiProperty({ type: ProfileDto, required: false })
   public profile?: ProfileDto;
+
+  @IsOptional()
+  @IsNumber(undefined, { each: true })
+  @ApiProperty({ type: 'number', required: false, isArray: true })
+  public coordinates: number[];
 }

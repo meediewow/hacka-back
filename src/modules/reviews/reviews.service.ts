@@ -46,6 +46,6 @@ export class ReviewsService {
 
   public async getUserReviews(userId: string) {
     const target = ObjectId.createFromHexString(userId);
-    return await this.reviewsRepository.find({ where: { target } });
+    return this.reviewsRepository.find({ where: { target } });
   }
 }

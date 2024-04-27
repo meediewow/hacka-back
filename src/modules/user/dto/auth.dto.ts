@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested
+} from 'class-validator';
 
 import { IUserAuthData } from '../types/user.types';
 import { PetRequestDto } from '../../pet/dto/pet.dto';
@@ -26,11 +31,16 @@ export class RegisterRequestDto extends AuthRequestDto {
   @IsOptional()
   role?: number;
 
-  @ApiProperty({ type: ProfileDto, required: false })
+  @ApiProperty({ type: ProfileDto })
   @ValidateNested()
   profile!: ProfileDto;
 
   @IsString()
   @ApiProperty({ type: 'string', example: 'about me' })
   public about?: string;
+
+  @ApiProperty({ type: 'number', required: false, isArray: true })
+  @IsOptional()
+  @IsNumber(undefined, { each: true })
+  coordinates?: number[];
 }

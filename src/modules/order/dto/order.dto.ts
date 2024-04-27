@@ -1,4 +1,4 @@
-import { IsDate, IsObject } from 'class-validator';
+import { IsObject } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ObjectId } from 'mongodb';
 import { ApiProperty } from '@nestjs/swagger';
@@ -6,6 +6,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { OrderEntity } from '../entities/order.entity';
 import { UserDto } from '../../user/dto';
 import { PetResponseDto } from '../../pet/dto/pet.dto';
+import { PeriodDto } from '../../../network/dto/period.dto';
 
 export class BaseOrderRequest {
   @IsObject()
@@ -20,15 +21,8 @@ export class OrderRequestDto implements Partial<OrderEntity> {
   @Transform(({ value }) => ObjectId.createFromHexString(value))
   sitterId: ObjectId;
 
-  @ApiProperty({ type: 'string', example: '2021-10-20T00:00:00.000Z' })
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
-  dateBegin: Date;
-
-  @ApiProperty({ type: 'string', example: '2021-10-20T00:00:00.000Z' })
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
-  dateEnd: Date;
+  @ApiProperty({ type: PeriodDto })
+  period: PeriodDto;
 
   @ApiProperty({
     type: 'string',
@@ -52,11 +46,11 @@ export class OrderResponseDto implements Partial<OrderEntity> {
 
   @ApiProperty({ type: 'string', example: '2021-10-20T00:00:00.000Z' })
   @Transform(({ value }) => value.toISOString())
-  dateBegin: Date;
+  startAt: Date;
 
   @ApiProperty({ type: 'string', example: '2021-10-20T00:00:00.000Z' })
   @Transform(({ value }) => value.toISOString())
-  dateEnd: Date;
+  finishAt: Date;
 
   @ApiProperty({
     type: PetResponseDto,

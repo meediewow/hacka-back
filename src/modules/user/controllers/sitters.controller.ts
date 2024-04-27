@@ -1,4 +1,4 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { SittersService } from '../services/sitters.service';
@@ -13,8 +13,8 @@ export class SittersController {
   @Post('list')
   @ApiBody({ type: SittersRequestDto })
   @ApiResponse({ type: SittersResponseDto })
-  public async sittersList(filters: SittersRequestDto) {
-    const list = await this.sittersService.getSittersList(filters);
+  public async sittersList(@Body() body: SittersRequestDto) {
+    const list = await this.sittersService.getSittersList(body);
     return { list };
   }
 }

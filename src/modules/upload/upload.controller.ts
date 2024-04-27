@@ -46,6 +46,6 @@ export class UploadController {
     )
     file: AwsS3File
   ): Promise<UploadDto> {
-    return await this.uploadService.findExistingOrCreate(file);
+    return this.uploadService.findExistingOrCreate(file);
   }
 }

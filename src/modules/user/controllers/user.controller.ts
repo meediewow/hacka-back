@@ -25,7 +25,7 @@ export class UserController {
   })
   @ApiResponse({ type: UserDto })
   public async getUser(@Param() { userId }: { userId: string }) {
-    return await this.userService.findUser({ id: userId });
+    return this.userService.findUser({ id: userId });
   }
 
   @GuardGet([UserRole.Client, UserRole.Sitter], 'me')
@@ -38,20 +38,20 @@ export class UserController {
   @ApiBody({ type: AuthRequestDto })
   @ApiResponse({ type: TokenResponseDto })
   public async auth(@Body() body: AuthRequestDto) {
-    return await this.userService.authUser(body);
+    return this.userService.authUser(body);
   }
 
   @Post('register')
   @ApiBody({ type: RegisterRequestDto })
   @ApiResponse({ type: TokenResponseDto })
   public async registration(@Body() body: RegisterRequestDto) {
-    return await this.userService.createUser(body);
+    return this.userService.createUser(body);
   }
 
   @GuardPost([UserRole.Client, UserRole.Sitter], 'update')
   @ApiBody({ type: UserUpdateRequestDto })
   @ApiResponse({ type: UserDto })
   public async update(@Body() body: UserUpdateRequestDto) {
-    return await this.userService.updateUserSafe(body);
+    return this.userService.updateUserSafe(body);
   }
 }

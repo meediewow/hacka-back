@@ -12,7 +12,7 @@ export class PetRequestDto implements Partial<PetEntity> {
   @IsString()
   name: string;
 
-  @ApiProperty({ type: 'number', example: 1 })
+  @ApiProperty({ type: 'enum', enum: PetType })
   @IsEnum(PetType)
   type: PetType;
 

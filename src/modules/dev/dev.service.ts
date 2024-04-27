@@ -19,10 +19,10 @@ export class DevService {
     const testEntity = new TestEntity();
     testEntity.title = title;
 
-    return await this.testRepository.save(testEntity);
+    return this.testRepository.save(testEntity);
   }
 
   async getAllEntities() {
-    return await this.testRepository.find();
+    return this.testRepository.find();
   }
 }

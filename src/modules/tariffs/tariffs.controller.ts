@@ -1,7 +1,7 @@
 import { Body, Controller, Param } from '@nestjs/common';
 import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { GuardPost, GuardGet } from '../user/decorators';
+import { GuardGet, GuardPost } from '../user/decorators';
 import { TariffDto } from '../user/dto/profile.dto';
 import { UserRole } from '../user/types/user.types';
 

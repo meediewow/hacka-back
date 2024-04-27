@@ -16,13 +16,14 @@ export class OrderEntity {
   clientId: UserEntity['_id'];
 
   @Column()
+  @Index()
   sitterId: UserEntity['_id'];
 
   @Column()
-  dateBegin: Date;
+  startAt: Date;
 
   @Column()
-  dateEnd: Date;
+  finishAt: Date;
 
   @Column()
   petIds: ObjectId[];

@@ -32,6 +32,6 @@ export class SessionService {
   }
 
   public async getSessionByToken(token: string) {
-    return await this.sessionRepository.findOne({ where: { token } });
+    return this.sessionRepository.findOne({ where: { token } });
   }
 }
