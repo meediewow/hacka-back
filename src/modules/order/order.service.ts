@@ -32,6 +32,9 @@ export class OrderService {
     return this.orderRepository.find({
       where: {
         sitterId: user._id
+      },
+      order: {
+        _id: -1
       }
     });
   }
@@ -42,6 +45,9 @@ export class OrderService {
     return this.orderRepository.find({
       where: {
         clientId: user._id
+      },
+      order: {
+        _id: -1
       }
     });
   }
