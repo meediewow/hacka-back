@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { MongoRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
@@ -38,6 +39,23 @@ export class UserService {
     return { token };
   }
 
+  public async findUser({ id, identifier }: IFindUserData) {
+    const where = id
+      ? {
+          _id: id ? ObjectId.createFromHexString(id) : undefined
+        }
+      : identifier
+        ? { identifier }
+        : null;
+
+    return await this.userRepository.findOne({ where });
+  }
+
+  private async isUserExists(data: IFindUserData) {
+    const user = await this.findUser(data);
+    return !!user;
+  }
+
   public async createUser(data: RegisterRequestDto) {
     const isExists = await this.isUserExists({ identifier: data.identifier });
 
@@ -60,19 +78,5 @@ export class UserService {
       password: data.password,
       identifier: data.identifier
     });
-  }
-
-  private async findUser({ id, identifier }: IFindUserData) {
-    return await this.userRepository.findOne({
-      where: {
-        identifier,
-        id
-      }
-    });
-  }
-
-  private async isUserExists(data: IFindUserData) {
-    const user = await this.findUser(data);
-    return !!user;
   }
 }

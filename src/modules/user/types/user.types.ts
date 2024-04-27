@@ -27,7 +27,7 @@ export interface IUserProfile {
 }
 
 export interface IUser extends IUserAuthData {
-  id: unknown;
+  _id: unknown;
   roles: UserRole[];
 
   profile?: IUserProfile;
@@ -36,4 +36,4 @@ export interface IUser extends IUserAuthData {
 
 export interface IUserSitterProfile {}
 
-export type IUserLight = Pick<IUser, 'id' | 'profile'>;
+export type IUserLight = Pick<IUser, '_id' | 'profile'>;

@@ -1,40 +1,29 @@
-import {
-  Get,
-  Post,
-  UseGuards,
-  Injectable,
-  CanActivate,
-  applyDecorators,
-  ExecutionContext
-} from '@nestjs/common';
-import { Request } from 'express';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { AsyncLocalStorage } from 'node:async_hooks';
 
-import { parseBearerToken, validateToken } from './utils';
+import {
+  applyDecorators,
+  CanActivate,
+  Get,
+  Inject,
+  Injectable,
+  Post,
+  UseGuards
+} from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Injectable()
 export class CheckToken implements CanActivate {
-  canActivate(context: ExecutionContext): Promise<boolean> | boolean {
-    const ctx = context.switchToHttp();
-    const request = ctx.getRequest<Request>();
+  @Inject(AsyncLocalStorage)
+  private als: AsyncLocalStorage<any>;
 
-    const authHeader: string = request.header('authorization');
-
-    if (!authHeader) {
-      return false;
-    }
-
-    try {
-      const jwtString = parseBearerToken(authHeader);
-      validateToken(jwtString);
-    } catch (error) {
-      return false;
-    }
+  canActivate(): Promise<boolean> | boolean {
+    const store = this.als.getStore();
+    return !!store?.user;
   }
 }
 
 export const AuthGuard = () =>
-  applyDecorators(ApiBearerAuth('jwt-bearer'), UseGuards(new CheckToken()));
+  applyDecorators(ApiBearerAuth('jwt-bearer'), UseGuards(CheckToken));
 
 export const GuardGet = (path?: string | string[]) =>
   applyDecorators(AuthGuard(), Get(path));

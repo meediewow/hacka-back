@@ -38,5 +38,5 @@ export const validateToken = (jwtString: string): AppJwtPayload => {
 };
 
 export const createTokenForUser = (user: UserEntity) => {
-  return sign({ id: user.id }, getEnvSafe('JWT_SECRET'));
+  return sign({ id: user._id }, getEnvSafe('JWT_SECRET'));
 };

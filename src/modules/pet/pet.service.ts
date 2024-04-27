@@ -19,7 +19,7 @@ export class PetService {
         (i) =>
           new PetEntity({
             ...i,
-            userId: userEntity.id
+            userId: userEntity._id
           })
       )
     );
@@ -28,7 +28,7 @@ export class PetService {
   getPets(userEntity: UserEntity): Promise<PetResponseDto[]> {
     return this.petRepository.find({
       where: {
-        userId: userEntity.id
+        userId: userEntity._id
       }
     });
   }
