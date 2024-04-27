@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ApiBody, ApiTags, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import {
   AuthRequestDto,
@@ -17,7 +17,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @ApiParam({ type: 'string', name: 'userId', example: '00-0000-0000' })
+  @ApiParam({ type: 'string', name: 'userId', example: 'string' })
   @ApiResponse({ type: UserDto })
   public getUser(@Param() {}: { userId: string }) {}
 

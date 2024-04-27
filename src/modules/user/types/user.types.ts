@@ -1,4 +1,5 @@
 import { PetResponseDto } from '../../pet/dto/pet.dto';
+import { PetType } from '../../pet/enum/pet-type.enum';
 
 export enum UserRole {
   Client = 1,
@@ -20,7 +21,7 @@ export interface IUserAuthData {
 }
 
 export interface ITariff {
-  category: number;
+  category: PetType;
   pricePerDay: number;
 }
 

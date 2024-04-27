@@ -2,11 +2,18 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
-import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  NotFoundException
+} from '@nestjs/common';
+import { DateTime } from 'luxon';
 
 import { UserEntity } from '../user/entities';
 import { UserService } from '../user/user.service';
 import { PetService } from '../pet/pet.service';
+import { TariffsService } from '../tariffs/tariffs.service';
 
 import { OrderEntity } from './entities/order.entity';
 import { OrderRequestDto } from './dto/order.dto';
@@ -25,6 +32,9 @@ export class OrderService {
 
   @Inject(PetService)
   private petService!: PetService;
+
+  @Inject(TariffsService)
+  private tariffsService!: TariffsService;
 
   async getSitterOrders(): Promise<OrderEntity[]> {
     const user = this.userAls.getStore().user;
@@ -104,6 +114,13 @@ export class OrderService {
 
     const sitter = await this.userService.findUser({ id: data.sitterId });
 
+    const dayStart = DateTime.fromJSDate(data.dateBegin);
+    const dayEnd = DateTime.fromJSDate(data.dateEnd);
+
+    if (dayEnd <= dayStart) {
+      throw new BadRequestException('Invalid date range');
+    }
+
     if (!sitter) {
       throw new NotFoundException('Sitter not found');
     }
@@ -114,12 +131,29 @@ export class OrderService {
       throw new NotFoundException('Some pets not found');
     }
 
+    if (sitter.profile?.tariff.length < 1) {
+      throw new BadRequestException('Sitter has no tariffs');
+    }
+
+    const selectedTariffs = sitter.profile.tariff.filter((tariff) =>
+      pets.find((pet) => pet.type === tariff.category)
+    );
+
+    const dayPriceBySelectedTariffs = Number(
+      selectedTariffs
+        .map((tariff) => tariff.pricePerDay)
+        .reduce((a, b) => a + b, 0)
+        .toFixed(2)
+    );
+
+    const daysCount = dayEnd.diff(dayStart, 'days').days;
+
     return this.orderRepository.save(
       new OrderEntity({
         ...data,
         clientId: client.user._id,
         status: Status.NEW,
-        price: 0,
+        price: dayPriceBySelectedTariffs * daysCount,
         isPayed: false
       })
     );
