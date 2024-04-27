@@ -1,3 +1,5 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+
 import { ObjectId } from 'mongodb';
 import { MongoRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,7 +11,7 @@ import { PetService } from '../pet/pet.service';
 import { UserEntity } from './entities';
 import { IFindUserData } from './types/common.types';
 import { ITokenContainer } from './types/token.types';
-import { IUserAuthData, UserRole } from './types/user.types';
+import { IUserAuthData, IUserLight, UserRole } from './types/user.types';
 import { createTokenForUser } from './decorators/auth/utils';
 import { RegisterRequestDto } from './dto';
 
@@ -18,8 +20,22 @@ export class UserService {
   @InjectRepository(UserEntity)
   private userRepository!: MongoRepository<UserEntity>;
 
+  @Inject(AsyncLocalStorage)
+  private readonly als: AsyncLocalStorage<any>;
+
   @Inject(PetService)
   private petService!: PetService;
+
+  public getMeUser() {
+    const { user } = this.als.getStore();
+
+    const result: IUserLight = {
+      _id: user._id,
+      profile: undefined
+    };
+
+    return result;
+  }
 
   public async authUser(data: IUserAuthData): Promise<ITokenContainer> {
     const user = await this.findUser({ identifier: data.identifier });
