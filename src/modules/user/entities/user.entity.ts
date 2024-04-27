@@ -23,4 +23,7 @@ export class UserEntity implements IUser {
 
   @Column()
   public profile?: IUserProfile;
+
+  @Column()
+  public rate: number;
 }

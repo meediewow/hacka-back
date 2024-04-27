@@ -1,9 +1,9 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
+import { ObjectId } from 'mongodb';
 import { MongoRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
 
 import { UserEntity } from '../user/entities';
 import { UserService } from '../user/user.service';
@@ -43,6 +43,7 @@ export class ReviewsService {
     review.photo = initiator.profile?.photo ?? '';
 
     await this.reviewsRepository.save(review);
+    await this.userService.updateUserRating(data.target, data.rate);
   }
 
   public async getUserReviews(userId: string) {
