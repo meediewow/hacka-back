@@ -17,8 +17,11 @@ import { UserEntity } from './entities';
 import { RegisterRequestDto } from './dto';
 import { IFindUserData } from './types/common.types';
 import { ITokenContainer } from './types/token.types';
+import { UserUpdateRequestDto } from './dto/user.dto';
 import { createTokenForUser } from './decorators/auth/utils';
-import { IUserAuthData, IUserLight, UserRole } from './types/user.types';
+import { IUserAuthData, UserRole } from './types/user.types';
+import { userMutationMerge } from './utils/userMerge.utils';
+import { toLightUser } from './utils/toLightUser.utils';
 
 @Injectable()
 export class UserService {
@@ -26,7 +29,7 @@ export class UserService {
   private userRepository!: MongoRepository<UserEntity>;
 
   @Inject(AsyncLocalStorage)
-  private readonly als: AsyncLocalStorage<any>;
+  private readonly als: AsyncLocalStorage<{ user: UserEntity }>;
 
   @Inject(PetService)
   private petService!: PetService;
@@ -47,20 +50,10 @@ export class UserService {
   }
 
   public async getMeUser() {
-    const user = this.als.getStore().user as UserEntity;
-
+    const user = this.als.getStore().user;
     const pets = await this.petService.getPets(user);
 
-    const result: IUserLight = {
-      _id: user._id,
-      pets: pets ?? [],
-      roles: user.roles,
-      rate: user.rate ?? 0,
-      profile: user.profile,
-      about: user.about ?? ''
-    };
-
-    return result;
+    return toLightUser(user, pets);
   }
 
   public async authUser(data: IUserAuthData): Promise<ITokenContainer> {
@@ -145,5 +138,13 @@ export class UserService {
     user.rate = user.rate ? (user.rate + rating) / 2 : rating;
 
     await this.userRepository.save(user);
+  }
+
+  public async updateUserSafe(data: UserUpdateRequestDto) {
+    const { user } = this.als.getStore();
+    const updatedUser = userMutationMerge(user, data);
+    const result = await this.userRepository.save(updatedUser);
+
+    return toLightUser(result);
   }
 }
