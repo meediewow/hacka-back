@@ -1,9 +1,14 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 import { ObjectId } from 'mongodb';
-import { FindOptionsWhere, MongoRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { FindOptionsWhere, MongoRepository } from 'typeorm';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
 
 import { encryptPassword } from '../../crypto';
 import { PetService } from '../pet/pet.service';
@@ -28,6 +33,17 @@ export class UserService {
 
   public getRepository(): MongoRepository<UserEntity> {
     return this.userRepository;
+  }
+
+  public async getOneUser(userId: string) {
+    const _id = ObjectId.createFromHexString(userId);
+    const result = await this.userRepository.findOne({ where: { _id } });
+
+    if (!result) {
+      throw new NotFoundException('User not found');
+    }
+
+    return result;
   }
 
   public async getMeUser() {
