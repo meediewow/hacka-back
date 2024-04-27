@@ -1,11 +1,11 @@
-import { Get, Post, Controller, Body, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import {
-  UserDto,
   AuthRequestDto,
+  RegisterRequestDto,
   TokenResponseDto,
-  RegisterRequestDto
+  UserDto
 } from './dto';
 import { UserService } from './user.service';
 
@@ -33,7 +33,7 @@ export class UserController {
   @Post('register')
   @ApiBody({ type: RegisterRequestDto })
   @ApiResponse({ type: TokenResponseDto })
-  public async registration(@Body() body: AuthRequestDto) {
+  public async registration(@Body() body: RegisterRequestDto) {
     return await this.userService.createUser(body);
   }
 
