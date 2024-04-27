@@ -15,7 +15,7 @@ export class PetEntity {
   type: PetType;
 
   @Column()
-  userId: UserEntity['id'];
+  userId: UserEntity['_id'];
 
   @Column({ nullable: true })
   name: string | null = null;
