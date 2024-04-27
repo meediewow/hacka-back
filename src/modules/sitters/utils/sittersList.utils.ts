@@ -9,9 +9,9 @@ export const aggregateSitters = (users: UserEntity[]) => {
     return {
       name,
       photo,
-      rating: 0,
       address: '',
       countOrders: 0,
+      rating: user.rate ?? 0,
       _id: user._id.toHexString()
     };
   });

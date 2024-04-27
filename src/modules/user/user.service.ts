@@ -53,9 +53,9 @@ export class UserService {
 
     const result: IUserLight = {
       _id: user._id,
-      rate: user.rate,
       pets: pets ?? [],
       roles: user.roles,
+      rate: user.rate ?? 0,
       profile: user.profile
     };
 
@@ -140,7 +140,8 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    user.rate = (user.rate + rating) / 2;
+    user.rate = user.rate ? (user.rate + rating) / 2 : rating;
+
     await this.userRepository.save(user);
   }
 }
