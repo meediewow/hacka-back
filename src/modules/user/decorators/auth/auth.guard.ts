@@ -1,21 +1,16 @@
 import {
-  CanActivate,
-  ExecutionContext,
   Get,
-  Injectable,
   Post,
   UseGuards,
-  applyDecorators
+  Injectable,
+  CanActivate,
+  applyDecorators,
+  ExecutionContext
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
-import { AppJwtPayload } from './types';
 import { parseBearerToken, validateToken } from './utils';
-
-const checkAppJwtPayload = async (payload: AppJwtPayload) => {
-  return payload.password === 'test';
-};
 
 @Injectable()
 export class CheckToken implements CanActivate {
@@ -31,8 +26,7 @@ export class CheckToken implements CanActivate {
 
     try {
       const jwtString = parseBearerToken(authHeader);
-      const payload = validateToken(jwtString);
-      return checkAppJwtPayload(payload);
+      validateToken(jwtString);
     } catch (error) {
       return false;
     }

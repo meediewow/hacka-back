@@ -1,22 +1,19 @@
 import { MongoRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { encryptPassword } from '../../crypto';
-import { SessionService } from '../session/session.service';
 
 import { UserEntity } from './entities';
 import { IFindUserData } from './types/common.types';
 import { ITokenContainer } from './types/token.types';
 import { IUserAuthData, UserRole } from './types/user.types';
+import { createTokenForUser } from './decorators/auth/utils';
 
 @Injectable()
 export class UserService {
   @InjectRepository(UserEntity)
   private userRepository: MongoRepository<UserEntity>;
-
-  @Inject(SessionService)
-  private sessionService: SessionService;
 
   public async authUser(data: IUserAuthData): Promise<ITokenContainer> {
     const user = await this.findUser({ identifier: data.identifier });
@@ -31,9 +28,9 @@ export class UserService {
       throw new BadRequestException('Incorrect login/password');
     }
 
-    const session = await this.sessionService.createSession(data.identifier);
+    const token = createTokenForUser(user);
 
-    return { token: session.token };
+    return { token };
   }
 
   private async findUser({ id, identifier }: IFindUserData) {
