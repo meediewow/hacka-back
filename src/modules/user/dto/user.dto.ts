@@ -1,7 +1,7 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IUserLight, IUserProfile } from '../types/user.types';
+import { IUserLight, IUserProfile, UserRole } from '../types/user.types';
 
 import { ProfileDto } from './profile.dto';
 
@@ -10,6 +10,10 @@ export class UserDto implements IUserLight {
   @ApiProperty({ type: 'string' })
   public _id: string;
 
-  @ApiProperty({ type: ProfileDto })
-  public profile: IUserProfile;
+  @ApiProperty({ type: 'number', isArray: true })
+  public roles: UserRole[];
+
+  @IsOptional()
+  @ApiProperty({ type: ProfileDto, required: false })
+  public profile?: IUserProfile;
 }

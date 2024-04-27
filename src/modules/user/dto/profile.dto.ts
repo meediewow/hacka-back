@@ -1,25 +1,34 @@
-import { IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-import {
-  IUserAddress,
-  IUserProfile,
-  IUserCommunicationData
-} from '../types/user.types';
+import { ITariff, IUserProfile } from '../types/user.types';
 
+import { AddressDto } from './address.dto';
 import { CommunicationDto } from './communication.dto';
+
+export class TariffDto {
+  @IsNumber()
+  @ApiProperty({ type: 'number', example: 1 })
+  category: number;
+
+  @IsNumber()
+  @ApiProperty({ type: 'number', example: 42 })
+  pricePerDay: number;
+}
 
 export class ProfileDto implements IUserProfile {
   @IsString()
   @ApiProperty({ type: 'string', example: 'Homer' })
-  public firstName: string;
+  public name: string;
 
-  @IsString()
-  @ApiProperty({ type: 'string', example: 'Simpson' })
-  public lastName: string;
+  @IsOptional()
+  @ApiProperty({ type: AddressDto, required: false })
+  public address?: AddressDto;
 
-  public address?: IUserAddress;
+  @ApiProperty({ type: CommunicationDto, required: false })
+  public communication: CommunicationDto;
 
-  @ApiProperty({ type: CommunicationDto })
-  public communication: IUserCommunicationData;
+  @IsOptional()
+  @ApiProperty({ type: TariffDto, isArray: true, required: false })
+  tariff: ITariff[];
 }

@@ -1,7 +1,8 @@
+import { PetResponseDto } from '../../pet/dto/pet.dto';
+
 export enum UserRole {
   Client = 1,
-  Sitter = 2,
-  Admin = 3
+  Sitter = 2
 }
 
 export type IUserCommunicationData = {
@@ -18,22 +19,26 @@ export interface IUserAuthData {
   password: string;
 }
 
-export interface IUserProfile {
-  firstName: string;
-  lastName: string;
+export interface ITariff {
+  category: number;
+  pricePerDay: number;
+}
 
+export interface IUserProfile {
+  name: string;
   address?: IUserAddress;
   communication: IUserCommunicationData;
+
+  tariff?: ITariff[];
 }
 
 export interface IUser extends IUserAuthData {
   _id: unknown;
   roles: UserRole[];
 
+  pets?: PetResponseDto[];
+
   profile?: IUserProfile;
-  sitterProfile?: IUserSitterProfile;
 }
 
-export interface IUserSitterProfile {}
-
-export type IUserLight = Pick<IUser, '_id' | 'profile'>;
+export type IUserLight = Omit<IUser, 'password' | 'identifier'>;
