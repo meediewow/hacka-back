@@ -1,20 +1,27 @@
-import { Column, CreateDateColumn, Entity, ObjectIdColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ObjectIdColumn
+} from 'typeorm';
 import { ObjectId } from 'mongodb';
 
 import { PetType } from '../enum/pet-type.enum';
 import { UserEntity } from '../../user/entities';
 
-export type PetData = Omit<PetEntity, 'id' | 'createdAt'>;
+export type PetData = Omit<PetEntity, '_id' | 'createdAt'>;
 
 @Entity()
 export class PetEntity {
   @ObjectIdColumn()
-  id: ObjectId;
+  _id: ObjectId;
 
   @Column()
   type: PetType;
 
   @Column()
+  @Index()
   userId: UserEntity['_id'];
 
   @Column({ nullable: true })

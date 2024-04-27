@@ -30,7 +30,7 @@ export class PetRequestDto implements Partial<PetEntity> {
 export class PetResponseDto implements Partial<PetEntity> {
   @ApiProperty({ type: 'string', example: 'f3wjufo3jwf933qrf' })
   @Transform(({ value }) => String(value))
-  id: ObjectId;
+  _id: ObjectId;
 
   @ApiProperty({ type: 'number', example: 1 })
   type: PetType;

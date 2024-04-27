@@ -37,4 +37,14 @@ export class PetService {
     await this.petRepository.delete(id);
     return true;
   }
+
+  getPetsByIds(ids: PetEntity['_id'][]): Promise<PetEntity[]> {
+    return this.petRepository.find({
+      where: {
+        _id: {
+          $in: ids
+        }
+      }
+    });
+  }
 }

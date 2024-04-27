@@ -11,6 +11,7 @@ import { UploadModule } from '../upload/upload.module';
 import { PetModule } from '../pet/pet.module';
 import { SessionModule } from '../session/session.module';
 import { userExtractor } from '../user/utils/userExtractor.utils';
+import { OrderModule } from '../order/order.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { userExtractor } from '../user/utils/userExtractor.utils';
     UploadModule,
     SessionModule,
     TypeOrmModule,
-    PetModule
+    PetModule,
+    OrderModule
   ],
   providers: [],
   controllers: []
