@@ -34,7 +34,7 @@ export class ClientOrderController {
     return this.orderService.getClientOrders();
   }
 
-  @GuardPost([UserRole.Client], '/:id')
+  @GuardGet([UserRole.Client], '/:id')
   @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ type: OrderResponseDto })
   public async getOrder(@Param('id') id: string) {

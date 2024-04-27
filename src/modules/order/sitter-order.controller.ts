@@ -27,7 +27,7 @@ export class SitterOrderController {
     return this.orderService.getSitterOrders();
   }
 
-  @GuardPost([UserRole.Sitter], '/:id')
+  @GuardGet([UserRole.Sitter], '/:id')
   @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ type: OrderResponseDto })
   public async getOrder(@Param('id') id: string) {
