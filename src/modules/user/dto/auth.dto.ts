@@ -27,6 +27,10 @@ export class RegisterRequestDto extends AuthRequestDto {
   role?: number;
 
   @ApiProperty({ type: ProfileDto, required: false })
-  @IsOptional()
-  profile?: ProfileDto;
+  @ValidateNested()
+  profile!: ProfileDto;
+
+  @IsString()
+  @ApiProperty({ type: 'string', example: 'about me' })
+  public about?: string;
 }

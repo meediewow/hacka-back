@@ -5,11 +5,11 @@ const mergeProfile = (
   userProfile: UserEntity['profile'],
   data: UserUpdateRequestDto['profile']
 ): UserEntity['profile'] => {
-  userProfile.name = data.name ?? userProfile.name;
-  userProfile.photo = data.photo ?? userProfile.photo;
-  userProfile.tariff = data.tariff ?? userProfile.tariff;
-  userProfile.address = data.address ?? userProfile.address;
-  userProfile.communication = data.communication ?? userProfile.communication;
+  userProfile.name = data?.name ?? userProfile.name;
+  userProfile.photo = data?.photo ?? userProfile.photo;
+  userProfile.tariff = data?.tariff ?? userProfile.tariff;
+  userProfile.address = data?.address ?? userProfile.address;
+  userProfile.communication = data?.communication ?? userProfile.communication;
 
   return userProfile;
 };

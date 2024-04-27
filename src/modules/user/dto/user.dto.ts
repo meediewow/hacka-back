@@ -3,13 +3,13 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { Transform } from 'class-transformer';
 
-import { IUserLight, UserRole } from '../types/user.types';
+import { IUserUpdateData, UserRole } from '../types/user.types';
 import { PetResponseDto } from '../../pet/dto/pet.dto';
 import { UserEntity } from '../entities';
 
 import { ProfileDto } from './profile.dto';
 
-export class UserDto implements IUserLight {
+export class UserDto {
   @IsString()
   @ApiProperty({ type: 'string' })
   @Transform(({ value }) => String(value))
@@ -23,13 +23,17 @@ export class UserDto implements IUserLight {
 
   @IsOptional()
   @ApiProperty({ type: ProfileDto, required: false })
-  public profile?: ProfileDto;
+  public profile: ProfileDto;
 
   @IsNumber()
   @ApiProperty({ type: 'number' })
   public rate: number;
 
-  constructor(data: UserEntity & { pets?: PetResponseDto[] }) {
+  @IsString()
+  @ApiProperty({ type: 'string' })
+  public about?: string;
+
+  constructor(data: UserEntity & { pets: PetResponseDto[] }) {
     this._id = data._id;
     this.roles = data.roles;
     this.pets = data.pets;
@@ -37,6 +41,17 @@ export class UserDto implements IUserLight {
   }
 
   static fromEntity(entity: UserEntity & { pets?: PetResponseDto[] }): UserDto {
-    return new UserDto(entity);
+    return new UserDto({ ...entity, pets: entity.pets ?? [] });
   }
+}
+
+export class UserUpdateRequestDto implements IUserUpdateData {
+  @IsString()
+  @IsOptional()
+  @ApiProperty({ type: 'string', example: 'new text about me' })
+  public about?: string;
+
+  @IsOptional()
+  @ApiProperty({ type: ProfileDto, required: false })
+  public profile?: ProfileDto;
 }

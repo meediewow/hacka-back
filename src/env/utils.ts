@@ -40,6 +40,7 @@ export const getEnvSafe = <Key extends EnvVariablesKey>(
   if (defaultEnvVariable === undefined) {
     throw new Error(`Environment variable ${key} is not defined`);
   }
+  return defaultEnvVariable;
 };
 
 export const isProduction = () => getEnvSafe('NODE_ENV') === 'production';

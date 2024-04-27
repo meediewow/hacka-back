@@ -8,9 +8,13 @@ export function getFileLimits(
 ): (typeof FILE_LIMITS)[number] {
   const extension = extname(originalName).replace('.', '').toLowerCase();
 
-  return FILE_LIMITS.find(
+  const result = FILE_LIMITS.find(
     (i) =>
       i.mimeType === mimeType &&
       (!i.extensions || i.extensions.includes(extension))
   );
+  if (!result) {
+    throw new Error('File type is not supported');
+  }
+  return result;
 }

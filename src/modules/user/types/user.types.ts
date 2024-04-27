@@ -44,7 +44,13 @@ export interface IUser extends IUserAuthData {
 
   rate: number;
 
+  about?: string;
+
   profile?: IUserProfile;
 }
 
 export type IUserLight = Omit<IUser, 'password' | 'identifier'>;
+
+export type IUserUpdateData = Partial<
+  Omit<IUserLight, '_id' | 'pets' | 'rate' | 'roles'>
+>;

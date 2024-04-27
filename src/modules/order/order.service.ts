@@ -1,5 +1,3 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
-
 import {
   BadRequestException,
   ForbiddenException,
@@ -12,9 +10,11 @@ import { DateTime } from 'luxon';
 import { ObjectId } from 'mongodb';
 
 import { UserEntity } from '../user/entities';
-import { UserService } from '../user/user.service';
+import { UserService } from '../user/services/user.service';
 import { PetService } from '../pet/pet.service';
 import { UserDto } from '../user/dto';
+import { AlsService } from '../../als/als.service';
+import { UserRole } from '../user/types/user.types';
 
 import { OrderEntity } from './entities/order.entity';
 import { OrderRequestDto, OrderResponseDto } from './dto/order.dto';
@@ -25,8 +25,8 @@ import { PayDto } from './dto/pay.dto';
 
 @Injectable()
 export class OrderService {
-  @Inject(AsyncLocalStorage)
-  private readonly userAls!: AsyncLocalStorage<{ user: UserEntity }>;
+  @Inject(AlsService)
+  private readonly alsService!: AlsService;
 
   @Inject(forwardRef(() => UserService))
   private userService!: UserService;
@@ -38,10 +38,8 @@ export class OrderService {
   private orderRepository!: OrderRepository;
 
   async getOrdersCount(userId: UserEntity['_id']): Promise<number> {
-    return this.orderRepository.count({
-      where: {
-        $or: [{ clientId: userId }, { sitterId: userId }]
-      }
+    return this.orderRepository.countBy({
+      $or: [{ clientId: userId }, { sitterId: userId }]
     });
   }
 
@@ -58,7 +56,7 @@ export class OrderService {
 
     return {
       ...order,
-      sitter: UserDto.fromEntity(this.userAls.getStore().user),
+      sitter: UserDto.fromEntity(this.alsService.getStore().user),
       client: await this.userService.findUser({ id: order.clientId }),
       pets: await this.petService.getPetsByIds(order.petIds)
     };
@@ -69,7 +67,7 @@ export class OrderService {
       ObjectId.createFromHexString(id)
     );
 
-    if (!result.sitterId.equals(this.userAls.getStore().user._id)) {
+    if (!result.sitterId.equals(this.alsService.getStore().user._id)) {
       throw new ForbiddenException();
     }
 
@@ -85,7 +83,7 @@ export class OrderService {
       ObjectId.createFromHexString(id)
     );
 
-    if (!result.clientId.equals(this.userAls.getStore().user._id)) {
+    if (!result.clientId.equals(this.alsService.getStore().user._id)) {
       throw new ForbiddenException();
     }
 
@@ -97,7 +95,7 @@ export class OrderService {
   }
 
   async getSitterOrders(): Promise<OrderEntity[]> {
-    const user = this.userAls.getStore().user;
+    const user = this.alsService.getStore().user;
 
     const result = await this.orderRepository.getSitterOrders(user._id);
     return result.map((order) => {
@@ -110,7 +108,7 @@ export class OrderService {
   }
 
   async getClientOrders(): Promise<OrderEntity[]> {
-    const user = this.userAls.getStore().user;
+    const user = this.alsService.getStore().user;
 
     const result = await this.orderRepository.getClientOrders(user._id);
     return result.map((order) => {
@@ -125,7 +123,7 @@ export class OrderService {
   async changeSitterStatus(
     args: ChangeOrderStatusRequestDto
   ): Promise<OrderResponseDto> {
-    const sitter = this.userAls.getStore().user;
+    const sitter = this.alsService.getStore().user;
 
     const order = await this.orderRepository.findOneOrFail({
       where: {
@@ -160,7 +158,7 @@ export class OrderService {
   async changeClientStatus(
     args: ChangeOrderStatusRequestDto
   ): Promise<OrderResponseDto> {
-    const client = this.userAls.getStore().user;
+    const client = this.alsService.getStore().user;
 
     const order = await this.orderRepository.findOneOrFail({
       where: {
@@ -194,7 +192,7 @@ export class OrderService {
   }
 
   async createOrder(data: OrderRequestDto): Promise<OrderResponseDto> {
-    const client = this.userAls.getStore();
+    const client = this.alsService.getStore();
 
     const sitter = await this.userService.findUser({ id: data.sitterId });
 
@@ -205,7 +203,7 @@ export class OrderService {
       throw new BadRequestException('Invalid date range');
     }
 
-    if (!sitter) {
+    if (!sitter || !sitter.roles.includes(UserRole.Sitter)) {
       throw new NotFoundException('Sitter not found');
     }
 
@@ -215,13 +213,14 @@ export class OrderService {
       throw new NotFoundException('Some pets not found');
     }
 
-    if (sitter.profile?.tariff.length < 1) {
+    if (sitter.profile?.tariff?.length ?? 0 < 1) {
       throw new BadRequestException('Sitter has no tariffs');
     }
 
-    const selectedTariffs = sitter.profile.tariff.filter((tariff) =>
-      pets.find((pet) => pet.type === tariff.category)
-    );
+    const selectedTariffs =
+      sitter.profile.tariff?.filter((tariff) =>
+        pets.find((pet) => pet.type === tariff.category)
+      ) ?? [];
 
     const dailyPrice = Number(
       selectedTariffs

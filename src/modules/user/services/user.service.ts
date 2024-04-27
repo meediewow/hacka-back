@@ -1,5 +1,3 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
-
 import { ObjectId } from 'mongodb';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, MongoRepository } from 'typeorm';
@@ -10,26 +8,26 @@ import {
   Injectable
 } from '@nestjs/common';
 
-import { encryptPassword } from '../../crypto';
-import { PetService } from '../pet/pet.service';
-import { OrderService } from '../order/order.service';
-
-import { UserEntity } from './entities';
-import { RegisterRequestDto, UserDto } from './dto';
-import { IFindUserData } from './types/common.types';
-import { ITokenContainer } from './types/token.types';
-import { UserUpdateRequestDto } from './dto/user.dto';
-import { createTokenForUser } from './decorators/auth/utils';
-import { IUserAuthData, UserRole } from './types/user.types';
-import { userMutationMerge } from './utils/userMerge.utils';
+import { encryptPassword } from '../../../crypto';
+import { PetService } from '../../pet/pet.service';
+import { OrderService } from '../../order/order.service';
+import { UserEntity } from '../entities';
+import { RegisterRequestDto, UserDto } from '../dto';
+import { IFindUserData } from '../types/common.types';
+import { ITokenContainer } from '../types/token.types';
+import { UserUpdateRequestDto } from '../dto/user.dto';
+import { createTokenForUser } from '../decorators/auth/utils';
+import { IUserAuthData, UserRole } from '../types/user.types';
+import { userMutationMerge } from '../utils/userMerge.utils';
+import { AlsService } from '../../../als/als.service';
 
 @Injectable()
 export class UserService {
   @InjectRepository(UserEntity)
   private userRepository!: MongoRepository<UserEntity>;
 
-  @Inject(AsyncLocalStorage)
-  private readonly als: AsyncLocalStorage<{ user: UserEntity }>;
+  @Inject(AlsService)
+  private readonly userAls: AlsService;
 
   @Inject(PetService)
   private petService!: PetService;
@@ -51,7 +49,7 @@ export class UserService {
   }
 
   public async getMeUser() {
-    const user = this.als.getStore().user;
+    const { user } = this.userAls.getStore();
     const pets = await this.petService.getPets(user);
     return UserDto.fromEntity({ ...user, pets });
   }
@@ -84,12 +82,15 @@ export class UserService {
     } else if (id) {
       where = { _id: ObjectId.createFromHexString(id) };
     } else {
-      where = identifier ? { identifier } : null;
+      where = identifier ? { identifier } : {};
     }
 
-    const user = await this.userRepository.findOne({ where });
+    const user = await this.userRepository.findOneOrFail({ where });
     await this.addOrdersCountToUser(user);
-    return UserDto.fromEntity(user);
+    return UserDto.fromEntity({
+      ...user,
+      pets: await this.petService.getPets(user)
+    });
   }
 
   public async createUser(data: RegisterRequestDto) {
@@ -135,14 +136,20 @@ export class UserService {
   }
 
   public async updateUserSafe(data: UserUpdateRequestDto) {
-    const { user } = this.als.getStore();
+    const { user } = this.userAls.getStore();
     const updatedUser = userMutationMerge(user, data);
     const result = await this.userRepository.save(updatedUser);
 
-    return UserDto.fromEntity(result);
+    return UserDto.fromEntity({
+      ...result,
+      pets: await this.petService.getPets(result)
+    });
   }
 
   private async addOrdersCountToUser(user: UserEntity) {
+    if (!user.profile) {
+      return;
+    }
     user.profile.ordersCount = await this.orderService.getOrdersCount(user._id);
   }
 

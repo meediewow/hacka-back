@@ -1,5 +1,3 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
-
 import {
   applyDecorators,
   CanActivate,
@@ -16,11 +14,12 @@ import { Reflector } from '@nestjs/core';
 
 import { UserRole } from '../../types/user.types';
 import { UserEntity } from '../../entities';
+import { AlsService } from '../../../../als/als.service';
 
 @Injectable()
 export class CheckToken implements CanActivate {
-  @Inject(AsyncLocalStorage)
-  private als!: AsyncLocalStorage<{ user: UserEntity }>;
+  @Inject(AlsService)
+  private als!: AlsService;
 
   @Inject(Reflector)
   private reflector!: Reflector;

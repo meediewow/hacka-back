@@ -3,7 +3,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { Request } from 'express';
 import { MiddlewareConsumer } from '@nestjs/common';
 
-import { UserService } from '../user.service';
+import { UserService } from '../services/user.service';
 import { parseBearerToken, validateToken } from '../decorators/auth/utils';
 
 export const userExtractor = (
@@ -13,7 +13,7 @@ export const userExtractor = (
 ) => {
   consumer
     .apply(async (req: Request, _, next) => {
-      const authHeader: string = req.header('authorization');
+      const authHeader = req?.header('authorization');
 
       if (!authHeader) {
         return next();

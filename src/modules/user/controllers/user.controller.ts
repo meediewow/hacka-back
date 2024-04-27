@@ -6,11 +6,11 @@ import {
   RegisterRequestDto,
   TokenResponseDto,
   UserDto
-} from './dto';
-import { GuardGet, GuardPost } from './decorators';
-import { UserService } from './user.service';
-import { UserRole } from './types/user.types';
-import { UserUpdateRequestDto } from './dto/user.dto';
+} from '../dto';
+import { GuardGet, GuardPost } from '../decorators';
+import { UserService } from '../services/user.service';
+import { UserRole } from '../types/user.types';
+import { UserUpdateRequestDto } from '../dto/user.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -25,7 +25,7 @@ export class UserController {
   })
   @ApiResponse({ type: UserDto })
   public async getUser(@Param() { userId }: { userId: string }) {
-    return await this.userService.findByIdOrFail(userId);
+    return await this.userService.findUser({ id: userId });
   }
 
   @GuardGet([UserRole.Client, UserRole.Sitter], 'me')

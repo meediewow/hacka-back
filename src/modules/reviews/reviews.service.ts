@@ -1,12 +1,10 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
-
 import { ObjectId } from 'mongodb';
 import { MongoRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
-import { UserEntity } from '../user/entities';
-import { UserService } from '../user/user.service';
+import { UserService } from '../user/services/user.service';
+import { AlsService } from '../../als/als.service';
 
 import { AddReviewRequestDto } from './dto/review.dto';
 import { ReviewEntity } from './entities/review.entity';
@@ -16,8 +14,8 @@ export class ReviewsService {
   @InjectRepository(ReviewEntity)
   private readonly reviewsRepository!: MongoRepository<ReviewEntity>;
 
-  @Inject(AsyncLocalStorage)
-  private readonly als: AsyncLocalStorage<{ user: UserEntity }>;
+  @Inject(AlsService)
+  private readonly alsService: AlsService;
 
   @Inject(UserService)
   private userService: UserService;
@@ -31,7 +29,7 @@ export class ReviewsService {
       throw new BadRequestException('User is not found');
     }
 
-    const initiator = this.als.getStore().user;
+    const initiator = this.alsService.getStore().user;
 
     const review = new ReviewEntity();
 

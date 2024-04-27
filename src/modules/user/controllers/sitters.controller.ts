@@ -1,8 +1,8 @@
 import { Controller, Post } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { SittersService } from './sitters.service';
-import { SittersRequestDto, SittersResponseDto } from './dto/sitters.dto';
+import { SittersService } from '../services/sitters.service';
+import { SittersRequestDto, SittersResponseDto } from '../dto/sitters.dto';
 
 @ApiTags('Sitter')
 @Controller('sitter')

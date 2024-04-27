@@ -6,20 +6,18 @@ import { SessionModule } from '../session/session.module';
 import { PetModule } from '../pet/pet.module';
 import { OrderModule } from '../order/order.module';
 
+import { UserService } from './services/user.service';
+import { UserController } from './controllers/user.controller';
 import { UserEntity } from './entities';
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
-
-const entities = [UserEntity];
-
-const EntitiesModule = TypeOrmModule.forFeature(entities);
+import { SittersService } from './services/sitters.service';
+import { SittersController } from './controllers/sitters.controller';
 
 @Module({
-  providers: [UserService],
-  controllers: [UserController],
-  exports: [UserService, EntitiesModule, PetModule, OrderModule],
+  providers: [UserService, SittersService],
+  controllers: [UserController, SittersController],
+  exports: [UserService, PetModule, OrderModule],
   imports: [
-    EntitiesModule,
+    TypeOrmModule.forFeature([UserEntity]),
     SessionModule,
     AlsModule,
     PetModule,

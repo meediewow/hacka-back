@@ -1,18 +1,16 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
-
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
-import { UserEntity } from '../user/entities';
 import { TariffDto } from '../user/dto/profile.dto';
-import { UserService } from '../user/user.service';
+import { UserService } from '../user/services/user.service';
+import { AlsService } from '../../als/als.service';
 
 @Injectable()
 export class TariffsService {
   @Inject(UserService)
   private userService!: UserService;
 
-  @Inject(AsyncLocalStorage)
-  private readonly als: AsyncLocalStorage<{ user: UserEntity }>;
+  @Inject(AlsService)
+  private readonly als: AlsService;
 
   public async addTariff(data: TariffDto) {
     const { user } = this.als.getStore();
