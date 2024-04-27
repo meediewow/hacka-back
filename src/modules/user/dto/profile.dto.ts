@@ -37,3 +37,8 @@ export class ProfileDto implements IUserProfile {
   @ApiProperty({ type: TariffDto, isArray: true, required: false })
   tariff: ITariff[];
 }
+
+export class TariffsListResponseDto {
+  @ApiProperty({ type: TariffDto, required: false, isArray: true })
+  list: TariffDto[];
+}
