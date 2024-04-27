@@ -5,7 +5,6 @@ import { GuardPost, GuardGet } from '../user/decorators';
 import { TariffDto } from '../user/dto/profile.dto';
 import { UserRole } from '../user/types/user.types';
 
-
 import { TariffsService } from './tariffs.service';
 import { TariffsListResponseDto } from './dto/tariff.dto';
 
