@@ -27,8 +27,19 @@ export class PetRequestDto implements Partial<PetEntity> {
   comment: string | null = null;
 }
 
+export class AddPetsRequestDto {
+  @ApiProperty({ type: PetRequestDto, isArray: true })
+  pets: PetRequestDto[];
+}
+
+export class RemovePetRequestDto {
+  @ApiProperty({ type: 'string', example: '662d0cc3387c017a98c6a081' })
+  @Transform(({ value }) => String(value))
+  _id: ObjectId;
+}
+
 export class PetResponseDto implements Partial<PetEntity> {
-  @ApiProperty({ type: 'string', example: 'f3wjufo3jwf933qrf' })
+  @ApiProperty({ type: 'string', example: '662d0cc3387c017a98c6a081' })
   @Transform(({ value }) => String(value))
   _id: ObjectId;
 

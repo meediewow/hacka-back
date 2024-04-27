@@ -1,7 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AlsModule } from '../../als/als.module';
 import { SessionModule } from '../session/session.module';
 import { PetModule } from '../pet/pet.module';
 import { OrderModule } from '../order/order.module';
@@ -15,11 +14,10 @@ import { SittersController } from './controllers/sitters.controller';
 @Module({
   providers: [UserService, SittersService],
   controllers: [UserController, SittersController],
-  exports: [UserService, PetModule, OrderModule],
+  exports: [UserService],
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
     SessionModule,
-    AlsModule,
     PetModule,
     forwardRef(() => OrderModule)
   ]

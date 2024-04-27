@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 
 import { UserModule } from '../user/user.module';
-import { AlsModule } from '../../als/als.module';
 
 import { TariffsService } from './tariffs.service';
 import { TariffsController } from './tariffs.controller';
@@ -10,6 +9,6 @@ import { TariffsController } from './tariffs.controller';
   providers: [TariffsService],
   exports: [TariffsService],
   controllers: [TariffsController],
-  imports: [AlsModule, UserModule]
+  imports: [UserModule]
 })
 export class TariffsModule {}

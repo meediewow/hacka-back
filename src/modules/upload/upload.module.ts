@@ -1,8 +1,6 @@
 import { MulterModule } from '@nestjs/platform-express';
 import { Module } from '@nestjs/common';
 
-import { AlsModule } from '../../als/als.module';
-
 import { AwsS3Module } from './aws-s3/aws-s3.module';
 import { AwsS3Service } from './aws-s3/aws-s3.service';
 import { AwsS3Storage } from './storages';
@@ -11,7 +9,6 @@ import { UploadController } from './upload.controller';
 
 @Module({
   imports: [
-    AlsModule,
     MulterModule.registerAsync({
       imports: [AwsS3Module],
       useFactory: (awsS3Service: AwsS3Service) => ({

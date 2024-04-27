@@ -1,7 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AlsModule } from '../../als/als.module';
 import { UserModule } from '../user/user.module';
 import { PetModule } from '../pet/pet.module';
 
@@ -14,7 +13,6 @@ import { OrderRepository } from './order.repository';
 @Module({
   imports: [
     TypeOrmModule.forFeature([OrderEntity]),
-    AlsModule,
     forwardRef(() => UserModule),
     PetModule
   ],

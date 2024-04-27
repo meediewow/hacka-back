@@ -1,7 +1,9 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
+import { Inject } from '@nestjs/common';
 
 import { UserEntity } from '../user/entities';
+import { AlsService } from '../../als/als.service';
 
 import { PetData, PetEntity } from './entities/pet.entity';
 import { PetResponseDto } from './dto/pet.dto';
@@ -10,19 +12,24 @@ export class PetService {
   @InjectRepository(PetEntity)
   private petRepository: MongoRepository<PetEntity>;
 
-  addPets(
+  @Inject(AlsService)
+  private readonly userAls: AlsService;
+
+  async addPets(
     pets: Omit<PetData, 'userId'>[],
-    userEntity: UserEntity
-  ): Promise<PetEntity[]> {
-    return this.petRepository.save(
+    userEntity?: UserEntity
+  ): Promise<PetResponseDto[]> {
+    const user = userEntity ?? this.userAls.getStore().user;
+    await this.petRepository.save(
       pets.map(
         (i) =>
           new PetEntity({
             ...i,
-            userId: userEntity._id
+            userId: user._id
           })
       )
     );
+    return this.getPets(user);
   }
 
   getPets(userEntity: UserEntity): Promise<PetResponseDto[]> {
@@ -31,11 +38,6 @@ export class PetService {
         userId: userEntity._id
       }
     });
-  }
-
-  async removePet(id: string): Promise<boolean> {
-    await this.petRepository.delete(id);
-    return true;
   }
 
   getPetsByIds(ids: PetEntity['_id'][]): Promise<PetEntity[]> {

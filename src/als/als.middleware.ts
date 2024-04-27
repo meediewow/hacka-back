@@ -1,12 +1,4 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Inject,
-  Injectable,
-  Logger,
-  NestInterceptor
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Inject, Injectable, Logger, NestMiddleware } from '@nestjs/common';
 
 import {
   parseBearerToken,
@@ -17,24 +9,20 @@ import { UserService } from '../modules/user/services/user.service';
 import { AlsService } from './als.service';
 
 @Injectable()
-export class AlsInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(AlsInterceptor.name);
+export class AlsMiddleware implements NestMiddleware {
+  private readonly logger = new Logger(AlsMiddleware.name);
+
   @Inject(AlsService)
   private readonly alsService: AlsService;
 
   @Inject(UserService)
   private userService: UserService;
 
-  async intercept(
-    context: ExecutionContext,
-    next: CallHandler
-  ): Promise<Observable<any>> {
-    const request = context.switchToHttp().getRequest();
-
+  async use(request: any, res: any, next: () => void) {
     const authHeader = request?.header('authorization');
 
     if (!authHeader) {
-      return next.handle();
+      return next();
     }
 
     try {
@@ -43,10 +31,10 @@ export class AlsInterceptor implements NestInterceptor {
 
       const user = await this.userService.findByIdOrFail(payload.id);
 
-      this.alsService.run({ user }, next.handle);
+      this.alsService.enterWith({ user });
     } catch (error) {
       this.logger.error(error);
     }
-    return next.handle();
+    return next();
   }
 }
