@@ -10,6 +10,7 @@ import { UserService } from '../user/user.service';
 import { UploadModule } from '../upload/upload.module';
 import { PetModule } from '../pet/pet.module';
 import { SessionModule } from '../session/session.module';
+import { TariffsModule } from '../tariffs/tariffs.module';
 import { userExtractor } from '../user/utils/userExtractor.utils';
 
 @Module({
@@ -20,7 +21,8 @@ import { userExtractor } from '../user/utils/userExtractor.utils';
     UploadModule,
     SessionModule,
     TypeOrmModule,
-    PetModule
+    PetModule,
+    TariffsModule
   ],
   providers: [],
   controllers: []

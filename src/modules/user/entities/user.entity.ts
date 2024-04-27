@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { Entity, Column, ObjectIdColumn } from 'typeorm';
+import { Entity, Column, ObjectIdColumn, Index } from 'typeorm';
 
 import { IUser, UserRole, IUserProfile } from '../types/user.types';
 
@@ -15,6 +15,7 @@ export class UserEntity implements IUser {
   public isSitter: boolean;
 
   @Column()
+  @Index()
   public identifier: string;
 
   @Column()
