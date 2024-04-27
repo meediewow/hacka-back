@@ -25,9 +25,9 @@ export interface ITariff {
 }
 
 export interface IUserProfile {
-  name: string;
+  name?: string;
   address?: IUserAddress;
-  communication: IUserCommunicationData;
+  communication?: IUserCommunicationData;
 
   tariff?: ITariff[];
 }

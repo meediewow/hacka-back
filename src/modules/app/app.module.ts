@@ -10,6 +10,7 @@ import { UserService } from '../user/user.service';
 import { UploadModule } from '../upload/upload.module';
 import { PetModule } from '../pet/pet.module';
 import { SessionModule } from '../session/session.module';
+import { TariffsModule } from '../tariffs/tariffs.module';
 import { userExtractor } from '../user/utils/userExtractor.utils';
 import { OrderModule } from '../order/order.module';
 
@@ -22,6 +23,7 @@ import { OrderModule } from '../order/order.module';
     SessionModule,
     TypeOrmModule,
     PetModule,
+    TariffsModule,
     OrderModule
   ],
   providers: [],
