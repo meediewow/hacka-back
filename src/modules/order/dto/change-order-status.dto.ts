@@ -12,7 +12,7 @@ export class ChangeOrderStatusRequestDto implements Partial<OrderEntity> {
   @Transform(({ value }) => ObjectId.createFromHexString(value))
   orderId: ObjectId;
 
-  @ApiProperty({ type: 'string', example: '1' })
+  @ApiProperty({ type: 'number', example: '1' })
   @IsEnum(Status)
   status: number;
 }
