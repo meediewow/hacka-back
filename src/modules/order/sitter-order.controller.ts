@@ -1,5 +1,5 @@
-import { Body, Controller, Inject } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Inject, Param } from '@nestjs/common';
+import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { GuardGet, GuardPost } from '../user/decorators';
 import { UserRole } from '../user/types/user.types';
@@ -25,5 +25,12 @@ export class SitterOrderController {
   @ApiResponse({ type: OrderResponseDto, isArray: true })
   public async getClientOrders() {
     return this.orderService.getSitterOrders();
+  }
+
+  @GuardGet([UserRole.Sitter], '/:id')
+  @ApiParam({ name: 'id', type: 'string' })
+  @ApiResponse({ type: OrderResponseDto })
+  public async getOrder(@Param('id') id: string) {
+    return this.orderService.getSitterOrderById(id);
   }
 }

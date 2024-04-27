@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
-import { Entity, Column, ObjectIdColumn, Index } from 'typeorm';
+import { Column, Entity, Index, ObjectIdColumn } from 'typeorm';
 
-import { IUser, UserRole, IUserProfile } from '../types/user.types';
+import { IUser, IUserProfile, UserRole } from '../types/user.types';
 
 @Entity()
 export class UserEntity implements IUser {
@@ -22,7 +22,7 @@ export class UserEntity implements IUser {
   public roles: UserRole[];
 
   @Column()
-  public profile?: IUserProfile;
+  public profile: IUserProfile;
 
   @Column()
   public rate: number;

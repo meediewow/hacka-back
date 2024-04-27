@@ -4,7 +4,6 @@ import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GuardPost, GuardGet } from '../user/decorators';
 import { TariffDto } from '../user/dto/profile.dto';
 import { UserRole } from '../user/types/user.types';
-import { SuccessDto } from '../../network/dto/success.dto';
 
 import { TariffsService } from './tariffs.service';
 import { TariffsListResponseDto } from './dto/tariff.dto';
@@ -15,11 +14,11 @@ export class TariffsController {
   constructor(private tariffService: TariffsService) {}
 
   @GuardPost([UserRole.Client, UserRole.Sitter], 'add')
-  @ApiResponse({ type: SuccessDto })
+  @ApiResponse({ type: TariffsListResponseDto })
   @ApiBody({ type: TariffDto })
   public async addTariff(@Body() body: TariffDto) {
-    await this.tariffService.addTariff(body);
-    return { success: true };
+    const list = await this.tariffService.addTariff(body);
+    return { list };
   }
 
   @GuardGet([UserRole.Client, UserRole.Sitter], 'list/:userId')

@@ -17,9 +17,11 @@ export class TariffsService {
   public async addTariff(data: TariffDto) {
     const { user } = this.als.getStore();
     const tariff = [...(user.profile?.tariff ?? []), data];
-    user.profile = user.profile ? { ...user.profile, tariff } : { tariff };
+    user.profile = { ...user.profile, tariff };
 
     await this.userService.updateUser(user);
+
+    return tariff;
   }
 
   public async getUserTariffs(userId: string) {
