@@ -16,7 +16,7 @@ import { UserRole } from './types/user.types';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get(':userId')
+  @Get('get/:userId')
   @ApiParam({
     type: 'string',
     name: 'userId',
