@@ -14,6 +14,7 @@ import { TariffsModule } from '../tariffs/tariffs.module';
 import { userExtractor } from '../user/utils/userExtractor.utils';
 import { OrderModule } from '../order/order.module';
 import { SittersModule } from '../sitters/sitters.module';
+import { ReviewsModule } from '../reviews/reviews.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { SittersModule } from '../sitters/sitters.module';
     PetModule,
     TariffsModule,
     OrderModule,
-    SittersModule
+    SittersModule,
+    ReviewsModule
   ],
   providers: [],
   controllers: []
