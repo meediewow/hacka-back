@@ -16,10 +16,16 @@ import { UserRole } from './types/user.types';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
-  @ApiParam({ type: 'string', name: 'userId', example: 'string' })
+  @Get(':userId')
+  @ApiParam({
+    type: 'string',
+    name: 'userId',
+    example: '662cf548b0c0585ff5eb4b5d'
+  })
   @ApiResponse({ type: UserDto })
-  public getUser(@Param() {}: { userId: string }) {}
+  public async getUser(@Param() { userId }: { userId: string }) {
+    return await this.userService.getOneUser(userId);
+  }
 
   @GuardGet([UserRole.Client, UserRole.Sitter], 'me')
   @ApiResponse({ type: UserDto })
