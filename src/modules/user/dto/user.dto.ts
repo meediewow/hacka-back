@@ -24,4 +24,8 @@ export class UserDto implements IUserLight {
   @IsNumber()
   @ApiProperty({ type: 'number' })
   public rate: number;
+
+  @IsString()
+  @ApiProperty({ type: 'string' })
+  public about?: string;
 }

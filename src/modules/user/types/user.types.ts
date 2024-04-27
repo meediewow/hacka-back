@@ -42,6 +42,8 @@ export interface IUser extends IUserAuthData {
 
   rate: number;
 
+  about?: string;
+
   profile?: IUserProfile;
 }
 
