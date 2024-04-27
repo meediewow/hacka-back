@@ -20,6 +20,8 @@ export class TariffsService {
     user.profile = user.profile ? { ...user.profile, tariff } : { tariff };
 
     await this.userService.updateUser(user);
+
+    return tariff;
   }
 
   public async getUserTariffs(userId: string) {
