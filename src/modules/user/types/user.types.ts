@@ -1,6 +1,7 @@
 export enum UserRole {
-  Client = 'sitter',
-  Admin = 'client'
+  Client = 1,
+  Sitter = 2,
+  Admin = 3
 }
 
 export type IUserCommunicationData = {
@@ -28,7 +29,6 @@ export interface IUserProfile {
 export interface IUser extends IUserAuthData {
   id: unknown;
   roles: UserRole[];
-  isSitter: boolean;
 
   profile?: IUserProfile;
   sitterProfile?: IUserSitterProfile;
