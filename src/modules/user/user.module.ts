@@ -11,15 +11,12 @@ import { UserController } from './user.controller';
 
 const entities = [UserEntity];
 
+const EntitiesModule = TypeOrmModule.forFeature(entities);
+
 @Module({
   providers: [UserService],
   controllers: [UserController],
-  exports: [UserService],
-  imports: [
-    TypeOrmModule.forFeature(entities),
-    SessionModule,
-    AlsModule,
-    PetModule
-  ]
+  exports: [UserService, EntitiesModule, PetModule],
+  imports: [EntitiesModule, SessionModule, AlsModule, PetModule]
 })
 export class UserModule {}
