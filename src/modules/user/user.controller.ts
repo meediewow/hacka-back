@@ -7,6 +7,7 @@ import {
   TokenResponseDto,
   UserDto
 } from './dto';
+import { GuardGet } from './decorators';
 import { UserService } from './user.service';
 
 @ApiTags('User')
@@ -19,9 +20,11 @@ export class UserController {
   @ApiResponse({ type: UserDto })
   public getUser(@Param() {}: { userId: string }) {}
 
-  @Get('me')
+  @GuardGet('me')
   @ApiResponse({ type: UserDto })
-  public getMe() {}
+  public getMe() {
+    return this.userService.getMeUser();
+  }
 
   @Post('auth')
   @ApiBody({ type: AuthRequestDto })
