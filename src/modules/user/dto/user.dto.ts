@@ -1,8 +1,8 @@
-import { IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-import { IUserLight, UserRole } from '../types/user.types';
 import { PetResponseDto } from '../../pet/dto/pet.dto';
+import { IUserLight, UserRole } from '../types/user.types';
 
 import { ProfileDto } from './profile.dto';
 
@@ -20,4 +20,8 @@ export class UserDto implements IUserLight {
   @IsOptional()
   @ApiProperty({ type: ProfileDto, required: false })
   public profile?: ProfileDto;
+
+  @IsNumber()
+  @ApiProperty({ type: 'number' })
+  public rate: number;
 }

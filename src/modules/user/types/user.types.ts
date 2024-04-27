@@ -40,6 +40,8 @@ export interface IUser extends IUserAuthData {
 
   pets?: PetResponseDto[];
 
+  rate: number;
+
   profile?: IUserProfile;
 }
 

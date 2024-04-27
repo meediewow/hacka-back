@@ -55,6 +55,7 @@ export class UserService {
       _id: user._id,
       pets: pets ?? [],
       roles: user.roles,
+      rate: user.rate ?? 0,
       profile: user.profile
     };
 
@@ -104,6 +105,7 @@ export class UserService {
 
     const userEntity = new UserEntity();
 
+    userEntity.rate = 0;
     userEntity.profile = data.profile;
     userEntity.identifier = data.identifier;
     userEntity.roles = [data.role ?? UserRole.Client];
@@ -129,5 +131,17 @@ export class UserService {
   private async isUserExists(data: IFindUserData) {
     const user = await this.findUser(data);
     return !!user;
+  }
+
+  public async updateUserRating(_id: ObjectId, rating: number) {
+    const user = await this.userRepository.findOne({ where: { _id } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.rate = user.rate ? (user.rate + rating) / 2 : rating;
+
+    await this.userRepository.save(user);
   }
 }
