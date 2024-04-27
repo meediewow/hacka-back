@@ -9,6 +9,7 @@ import {
 } from './dto';
 import { GuardGet } from './decorators';
 import { UserService } from './user.service';
+import { UserRole } from './types/user.types';
 
 @ApiTags('User')
 @Controller('user')
@@ -20,7 +21,7 @@ export class UserController {
   @ApiResponse({ type: UserDto })
   public getUser(@Param() {}: { userId: string }) {}
 
-  @GuardGet('me')
+  @GuardGet([UserRole.Client, UserRole.Sitter], 'me')
   @ApiResponse({ type: UserDto })
   public getMe() {
     return this.userService.getMeUser();

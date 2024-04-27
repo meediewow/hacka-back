@@ -1,7 +1,6 @@
 import {
   Controller,
   ParseFilePipe,
-  Post,
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common';
@@ -12,6 +11,9 @@ import {
   ApiResponse,
   ApiTags
 } from '@nestjs/swagger';
+
+import { GuardPost } from '../user/decorators';
+import { UserRole } from '../user/types/user.types';
 
 import { UploadService } from './upload.service';
 import { UploadFileInterceptor } from './interceptors';
@@ -25,7 +27,7 @@ import { FileIsDefinedValidator } from './validators/file-is-defined.validator';
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post()
+  @GuardPost([UserRole.Client, UserRole.Sitter])
   @UseInterceptors(UploadFileInterceptor)
   @ApiTags('Upload')
   @ApiBody({

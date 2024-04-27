@@ -12,6 +12,7 @@ import { PetModule } from '../pet/pet.module';
 import { SessionModule } from '../session/session.module';
 import { TariffsModule } from '../tariffs/tariffs.module';
 import { userExtractor } from '../user/utils/userExtractor.utils';
+import { OrderModule } from '../order/order.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { userExtractor } from '../user/utils/userExtractor.utils';
     SessionModule,
     TypeOrmModule,
     PetModule,
-    TariffsModule
+    TariffsModule,
+    OrderModule
   ],
   providers: [],
   controllers: []

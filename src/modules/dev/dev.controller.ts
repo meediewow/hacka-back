@@ -1,19 +1,20 @@
 import {
-  ApiTags,
   ApiBody,
-  ApiQuery,
   ApiParam,
-  ApiResponse
+  ApiQuery,
+  ApiResponse,
+  ApiTags
 } from '@nestjs/swagger';
-import { Get, Post, Controller, Body, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { GuardGet } from '../user/decorators';
 import { ListQueryParamsDto } from '../../network';
+import { UserRole } from '../user/types/user.types';
 
 import {
-  TestEntityCreateRequestDto,
+  OneEntityResponseDto,
   TestEntitiesListResponseDto,
-  OneEntityResponseDto
+  TestEntityCreateRequestDto
 } from './dto/test.entity.dto';
 import { DevService } from './dev.service';
 import { PingResponseDto } from './dto/ping.dto';
@@ -30,7 +31,7 @@ export class DevController {
     return { content: this.devService.pong() };
   }
 
-  @GuardGet('guard')
+  @GuardGet([UserRole.Client, UserRole.Sitter], 'guard')
   @ApiResponse({ type: GuardResponseDto })
   getAuth() {
     return { content: 'Guarded content' };

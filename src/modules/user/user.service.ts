@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 import { ObjectId } from 'mongodb';
-import { MongoRepository } from 'typeorm';
+import { FindOptionsWhere, MongoRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
@@ -60,20 +60,17 @@ export class UserService {
   }
 
   public async findUser({ id, identifier }: IFindUserData) {
-    const where = id
-      ? {
-          _id: id ? ObjectId.createFromHexString(id) : undefined
-        }
-      : identifier
-        ? { identifier }
-        : null;
+    let where: FindOptionsWhere<UserEntity>;
+
+    if (id instanceof ObjectId) {
+      where = { _id: id };
+    } else if (id) {
+      where = { _id: ObjectId.createFromHexString(id) };
+    } else {
+      where = identifier ? { identifier } : null;
+    }
 
     return await this.userRepository.findOne({ where });
-  }
-
-  private async isUserExists(data: IFindUserData) {
-    const user = await this.findUser(data);
-    return !!user;
   }
 
   public async createUser(data: RegisterRequestDto) {
@@ -103,5 +100,10 @@ export class UserService {
       password: data.password,
       identifier: data.identifier
     });
+  }
+
+  private async isUserExists(data: IFindUserData) {
+    const user = await this.findUser(data);
+    return !!user;
   }
 }
