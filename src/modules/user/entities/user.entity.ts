@@ -11,7 +11,7 @@ import {
 @Entity()
 export class UserEntity implements IUser {
   @ObjectIdColumn()
-  public id: ObjectId;
+  public _id: ObjectId;
 
   @Column()
   public password: string;

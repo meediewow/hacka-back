@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { MongoRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -33,13 +34,16 @@ export class UserService {
     return { token };
   }
 
-  private async findUser({ id, identifier }: IFindUserData) {
-    return await this.userRepository.findOne({
-      where: {
-        identifier,
-        id
-      }
-    });
+  public async findUser({ id, identifier }: IFindUserData) {
+    const where = id
+      ? {
+          _id: id ? ObjectId.createFromHexString(id) : undefined
+        }
+      : identifier
+        ? { identifier }
+        : null;
+
+    return await this.userRepository.findOne({ where });
   }
 
   private async isUserExists(data: IFindUserData) {

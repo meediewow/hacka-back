@@ -13,6 +13,7 @@ const entities = [UserEntity];
 @Module({
   providers: [UserService],
   controllers: [UserController],
+  exports: [UserService],
   imports: [TypeOrmModule.forFeature(entities), SessionModule, AlsModule]
 })
 export class UserModule {}

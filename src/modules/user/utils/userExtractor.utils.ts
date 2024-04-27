@@ -3,14 +3,16 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { Request } from 'express';
 import { MiddlewareConsumer } from '@nestjs/common';
 
+import { UserService } from '../user.service';
 import { parseBearerToken, validateToken } from '../decorators/auth/utils';
 
-export const tokenExtractor = (
+export const userExtractor = (
   als: AsyncLocalStorage<any>,
+  userService: UserService,
   consumer: MiddlewareConsumer
 ) => {
   consumer
-    .apply((req: Request, _, next) => {
+    .apply(async (req: Request, _, next) => {
       const authHeader: string = req.header('authorization');
 
       if (!authHeader) {
@@ -21,7 +23,13 @@ export const tokenExtractor = (
         const jwtString = parseBearerToken(authHeader);
         const payload = validateToken(jwtString);
 
-        als.run({ userId: payload.id }, () => next());
+        const user = await userService.findUser({ id: payload.id });
+
+        if (!user) {
+          next();
+        }
+
+        als.run({ user }, () => next());
       } catch (error) {
         next();
       }

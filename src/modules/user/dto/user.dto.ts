@@ -8,7 +8,7 @@ import { ProfileDto } from './profile.dto';
 export class UserDto implements IUserLight {
   @IsString()
   @ApiProperty({ type: 'string' })
-  public id: string;
+  public _id: string;
 
   @ApiProperty({ type: ProfileDto })
   public profile: IUserProfile;

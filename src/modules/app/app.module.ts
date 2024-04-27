@@ -1,14 +1,15 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import { DevModule } from '../dev/dev.module';
 import { TypeOrmModule } from '../db/db.module';
 import { UserModule } from '../user/user.module';
 import { AlsModule } from '../../als/als.module';
+import { UserService } from '../user/user.service';
 import { UploadModule } from '../upload/upload.module';
 import { SessionModule } from '../session/session.module';
-import { tokenExtractor } from '../user/utils/tokenExtractor.utils';
+import { userExtractor } from '../user/utils/userExtractor.utils';
 
 @Module({
   imports: [
@@ -22,13 +23,13 @@ import { tokenExtractor } from '../user/utils/tokenExtractor.utils';
   providers: [],
   controllers: []
 })
-export class AppModule {
+export class AppModule implements NestModule {
   constructor(
-    // inject the AsyncLocalStorage in the module constructor,
-    private readonly als: AsyncLocalStorage<any>
+    private readonly als: AsyncLocalStorage<any>,
+    private readonly userService: UserService
   ) {}
 
   configure(consumer: MiddlewareConsumer) {
-    tokenExtractor(this.als, consumer);
+    userExtractor(this.als, this.userService, consumer);
   }
 }
