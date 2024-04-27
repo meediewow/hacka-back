@@ -1,7 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-import { InjectRepository } from '@nestjs/typeorm';
-import { MongoRepository } from 'typeorm';
 import {
   BadRequestException,
   ForbiddenException,
@@ -9,21 +7,20 @@ import {
   NotFoundException
 } from '@nestjs/common';
 import { DateTime } from 'luxon';
+import { ObjectId } from 'mongodb';
 
 import { UserEntity } from '../user/entities';
 import { UserService } from '../user/user.service';
 import { PetService } from '../pet/pet.service';
-import { TariffsService } from '../tariffs/tariffs.service';
+import { UserDto } from '../user/dto';
 
 import { OrderEntity } from './entities/order.entity';
-import { OrderRequestDto } from './dto/order.dto';
+import { OrderRequestDto, OrderResponseDto } from './dto/order.dto';
 import { Status } from './enums/status.enum';
 import { ChangeOrderStatusRequestDto } from './dto/change-order-status.dto';
+import { OrderRepository } from './order.repository';
 
 export class OrderService {
-  @InjectRepository(OrderEntity)
-  private readonly orderRepository!: MongoRepository<OrderEntity>;
-
   @Inject(AsyncLocalStorage)
   private readonly userAls!: AsyncLocalStorage<{ user: UserEntity }>;
 
@@ -33,38 +30,70 @@ export class OrderService {
   @Inject(PetService)
   private petService!: PetService;
 
-  @Inject(TariffsService)
-  private tariffsService!: TariffsService;
+  @Inject(OrderRepository)
+  private orderRepository!: OrderRepository;
+
+  async getSitterOrderById(id: string): Promise<OrderResponseDto> {
+    const result = await this.orderRepository.getFullOrderById(
+      ObjectId.createFromHexString(id)
+    );
+
+    if (!result.sitterId.equals(this.userAls.getStore().user._id)) {
+      throw new ForbiddenException();
+    }
+
+    return {
+      ...result,
+      sitter: UserDto.fromEntity(result.sitter),
+      client: UserDto.fromEntity(result.client)
+    };
+  }
+
+  async getClientOrderById(id: string): Promise<OrderResponseDto> {
+    const result = await this.orderRepository.getFullOrderById(
+      ObjectId.createFromHexString(id)
+    );
+
+    if (!result.clientId.equals(this.userAls.getStore().user._id)) {
+      throw new ForbiddenException();
+    }
+
+    return {
+      ...result,
+      sitter: UserDto.fromEntity(result.sitter),
+      client: UserDto.fromEntity(result.client)
+    };
+  }
 
   async getSitterOrders(): Promise<OrderEntity[]> {
     const user = this.userAls.getStore().user;
 
-    return this.orderRepository.find({
-      where: {
-        sitterId: user._id
-      },
-      order: {
-        _id: -1
-      }
+    const result = await this.orderRepository.getSitterOrders(user._id);
+    return result.map((order) => {
+      return {
+        ...order,
+        sitter: UserDto.fromEntity(order.sitter),
+        client: UserDto.fromEntity(order.client)
+      };
     });
   }
 
   async getClientOrders(): Promise<OrderEntity[]> {
     const user = this.userAls.getStore().user;
 
-    return this.orderRepository.find({
-      where: {
-        clientId: user._id
-      },
-      order: {
-        _id: -1
-      }
+    const result = await this.orderRepository.getClientOrders(user._id);
+    return result.map((order) => {
+      return {
+        ...order,
+        sitter: UserDto.fromEntity(order.sitter),
+        client: UserDto.fromEntity(order.client)
+      };
     });
   }
 
   async changeSitterStatus(
     args: ChangeOrderStatusRequestDto
-  ): Promise<OrderEntity> {
+  ): Promise<OrderResponseDto> {
     const sitter = this.userAls.getStore().user;
 
     const order = await this.findOrderOrFail(args.orderId);
@@ -82,12 +111,19 @@ export class OrderService {
     }
 
     order.status = args.status;
-    return this.orderRepository.save(order);
+    const updatedOrder = await this.orderRepository.save(order);
+    const client = await this.userService.findUser({ id: order.clientId });
+    return {
+      ...updatedOrder,
+      sitter: UserDto.fromEntity(sitter),
+      client: UserDto.fromEntity(client),
+      pets: await this.petService.getPetsByIds(updatedOrder.petIds)
+    };
   }
 
   async changeClientStatus(
     args: ChangeOrderStatusRequestDto
-  ): Promise<OrderEntity> {
+  ): Promise<OrderResponseDto> {
     const client = this.userAls.getStore().user;
 
     const order = await this.findOrderOrFail(args.orderId);
@@ -106,10 +142,18 @@ export class OrderService {
     }
 
     order.status = args.status;
-    return this.orderRepository.save(order);
+    const updatedOrder = await this.orderRepository.save(order);
+    const sitter = await this.userService.findUser({ id: order.sitterId });
+
+    return {
+      ...updatedOrder,
+      sitter: UserDto.fromEntity(sitter),
+      client: UserDto.fromEntity(client),
+      pets: await this.petService.getPetsByIds(updatedOrder.petIds)
+    };
   }
 
-  async createOrder(data: OrderRequestDto): Promise<OrderEntity> {
+  async createOrder(data: OrderRequestDto): Promise<OrderResponseDto> {
     const client = this.userAls.getStore();
 
     const sitter = await this.userService.findUser({ id: data.sitterId });
@@ -148,7 +192,7 @@ export class OrderService {
 
     const daysCount = dayEnd.diff(dayStart, 'days').days;
 
-    return this.orderRepository.save(
+    const order = await this.orderRepository.save(
       new OrderEntity({
         ...data,
         clientId: client.user._id,
@@ -157,6 +201,12 @@ export class OrderService {
         isPayed: false
       })
     );
+    return {
+      ...order,
+      client: UserDto.fromEntity(client.user),
+      sitter: UserDto.fromEntity(sitter),
+      pets
+    };
   }
 
   findOrderOrFail(_id: OrderEntity['_id']): Promise<OrderEntity> {

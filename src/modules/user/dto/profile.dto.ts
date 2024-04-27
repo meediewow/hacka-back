@@ -31,11 +31,11 @@ export class ProfileDto implements IUserProfile {
   public address?: AddressDto;
 
   @ApiProperty({ type: CommunicationDto, required: false })
-  public communication: CommunicationDto;
+  public communication?: CommunicationDto;
 
   @IsOptional()
   @ApiProperty({ type: TariffDto, isArray: true, required: false })
-  tariff: ITariff[];
+  tariff?: ITariff[];
 }
 
 export class TariffsListResponseDto {

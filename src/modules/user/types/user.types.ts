@@ -26,7 +26,7 @@ export interface ITariff {
 }
 
 export interface IUserProfile {
-  name?: string;
+  name: string;
   photo?: string;
   address?: IUserAddress;
   communication?: IUserCommunicationData;
