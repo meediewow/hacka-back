@@ -1,8 +1,10 @@
-import { IsString, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { IUserAuthData } from '../types/user.types';
 import { PetRequestDto } from '../../pet/dto/pet.dto';
+
+import { ProfileDto } from './profile.dto';
 
 export class AuthRequestDto implements IUserAuthData {
   @IsString()
@@ -14,14 +16,17 @@ export class AuthRequestDto implements IUserAuthData {
   public password: string;
 }
 
-export class RegistrationData {
-  @ValidateNested({ each: true })
-  @ApiProperty({ type: PetRequestDto, isArray: true })
-  pets: PetRequestDto[];
-}
-
 export class RegisterRequestDto extends AuthRequestDto {
-  @ApiProperty({ type: RegistrationData })
-  @ValidateNested()
-  data: RegistrationData;
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @ApiProperty({ type: PetRequestDto, isArray: true, required: false })
+  pets: PetRequestDto[];
+
+  @ApiProperty({ type: 'number', required: false, example: 1 })
+  @IsOptional()
+  role?: number;
+
+  @ApiProperty({ type: ProfileDto, required: false })
+  @IsOptional()
+  profile?: ProfileDto;
 }

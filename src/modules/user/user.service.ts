@@ -9,11 +9,11 @@ import { encryptPassword } from '../../crypto';
 import { PetService } from '../pet/pet.service';
 
 import { UserEntity } from './entities';
+import { RegisterRequestDto } from './dto';
 import { IFindUserData } from './types/common.types';
 import { ITokenContainer } from './types/token.types';
-import { IUserAuthData, IUserLight, UserRole } from './types/user.types';
 import { createTokenForUser } from './decorators/auth/utils';
-import { RegisterRequestDto } from './dto';
+import { IUserAuthData, IUserLight, UserRole } from './types/user.types';
 
 @Injectable()
 export class UserService {
@@ -26,12 +26,16 @@ export class UserService {
   @Inject(PetService)
   private petService!: PetService;
 
-  public getMeUser() {
-    const { user } = this.als.getStore();
+  public async getMeUser() {
+    const user = this.als.getStore().user as UserEntity;
+
+    const pets = await this.petService.getPets(user);
 
     const result: IUserLight = {
       _id: user._id,
-      profile: undefined
+      pets: pets ?? [],
+      roles: user.roles,
+      profile: user.profile
     };
 
     return result;
@@ -82,13 +86,18 @@ export class UserService {
     const passwordHash = encryptPassword(data.password);
 
     const userEntity = new UserEntity();
+
+    userEntity.profile = data.profile;
     userEntity.identifier = data.identifier;
-    userEntity.roles = [UserRole.Client];
+    userEntity.roles = [data.role ?? UserRole.Client];
+
     userEntity.password = passwordHash;
 
     const savedUser = await this.userRepository.save(userEntity);
 
-    await this.petService.addPets(data.data.pets, savedUser);
+    if (data.pets?.length) {
+      await this.petService.addPets(data.pets, savedUser);
+    }
 
     return this.authUser({
       password: data.password,
