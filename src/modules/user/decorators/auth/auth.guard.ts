@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import {
   applyDecorators,
   CanActivate,
+  ExecutionContext,
   Get,
   Inject,
   Injectable,
@@ -24,8 +25,11 @@ export class CheckToken implements CanActivate {
   @Inject(Reflector)
   private reflector!: Reflector;
 
-  canActivate(): Promise<boolean> | boolean {
-    const roles = this.reflector.get<UserRole[]>(ROLE_METADATA_KEY, CheckToken);
+  canActivate(context: ExecutionContext): Promise<boolean> | boolean {
+    const roles = this.reflector.get<UserRole[]>(
+      ROLE_METADATA_KEY,
+      context.getHandler()
+    );
 
     const store = this.als.getStore();
 
