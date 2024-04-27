@@ -7,7 +7,7 @@ import {
   ApiResponse
 } from '@nestjs/swagger';
 
-import { GuardGet } from '../../auth';
+import { GuardGet } from '../user/decorators';
 import { ListQueryParamsDto } from '../../network';
 
 import {

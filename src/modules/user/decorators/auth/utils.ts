@@ -1,6 +1,7 @@
-import { verify } from 'jsonwebtoken';
+import { verify, sign } from 'jsonwebtoken';
 
-import { getEnvSafe } from '../env';
+import { UserEntity } from '../../entities';
+import { getEnvSafe } from '../../../../env';
 
 import { AppJwtPayload } from './types';
 
@@ -34,4 +35,8 @@ export const validateToken = (jwtString: string): AppJwtPayload => {
   }
 
   throw new Error('Unexpected JWT payload');
+};
+
+export const createTokenForUser = (user: UserEntity) => {
+  return sign({ id: user.id }, getEnvSafe('JWT_SECRET'));
 };
