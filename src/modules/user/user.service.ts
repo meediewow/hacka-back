@@ -56,7 +56,8 @@ export class UserService {
       pets: pets ?? [],
       roles: user.roles,
       rate: user.rate ?? 0,
-      profile: user.profile
+      profile: user.profile,
+      about: user.about ?? ''
     };
 
     return result;
@@ -107,6 +108,7 @@ export class UserService {
 
     userEntity.rate = 0;
     userEntity.profile = data.profile;
+    userEntity.about = data.about ?? '';
     userEntity.identifier = data.identifier;
     userEntity.roles = [data.role ?? UserRole.Client];
 

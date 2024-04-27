@@ -29,6 +29,10 @@ export class UserDto implements IUserLight {
   @ApiProperty({ type: 'number' })
   public rate: number;
 
+  @IsString()
+  @ApiProperty({ type: 'string' })
+  public about?: string;
+
   constructor(data: UserEntity & { pets?: PetResponseDto[] }) {
     this._id = data._id;
     this.roles = data.roles;
