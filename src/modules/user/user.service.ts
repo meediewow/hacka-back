@@ -102,6 +102,10 @@ export class UserService {
     });
   }
 
+  public async updateUser(user: UserEntity) {
+    await this.userRepository.save(user);
+  }
+
   private async isUserExists(data: IFindUserData) {
     const user = await this.findUser(data);
     return !!user;
