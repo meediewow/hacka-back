@@ -51,6 +51,7 @@ export class UserService {
 
   public async getMeUser() {
     const { user } = this.userAls.getStore();
+    await this.addOrdersCountToUser(user);
 
     await this.addRateToUser(user);
     const pets = await this.petService.getPets(user);

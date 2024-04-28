@@ -7,6 +7,7 @@ import { OrderEntity } from '../entities/order.entity';
 import { UserDto } from '../../user/dto';
 import { PetResponseDto } from '../../pet/dto/pet.dto';
 import { PeriodDto } from '../../../network/dto/period.dto';
+import { Status } from '../enums/status.enum';
 
 export class BaseOrderRequest {
   @IsObject()
@@ -58,8 +59,8 @@ export class OrderResponseDto implements Partial<OrderEntity> {
   })
   pets: PetResponseDto[];
 
-  @ApiProperty({ type: 'number', example: 0 })
-  status: number;
+  @ApiProperty({ type: 'enum', enum: Status })
+  status: Status;
 
   @ApiProperty({ type: 'boolean', example: false })
   isPayed: boolean;
