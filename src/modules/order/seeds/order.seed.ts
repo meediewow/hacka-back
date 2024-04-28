@@ -29,8 +29,8 @@ export class OrderSeed implements OnApplicationBootstrap {
       return;
     }
 
-    for (let i = 0; i < 5; i++) {
-      await this.seed(faker.number.int({ min: 5, max: 3 }));
+    for (let i = 0; i < 50; i++) {
+      await this.seed(faker.number.int({ min: 2, max: 10 }));
     }
   }
 

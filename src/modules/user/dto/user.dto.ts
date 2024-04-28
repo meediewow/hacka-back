@@ -48,6 +48,7 @@ export class UserDto {
     this.rate = Number(data.rate?.toFixed(1) ?? 0);
     this.coordinates = data.location?.coordinates;
     this.price = data.price;
+    this.about = data.about;
   }
 
   static fromEntity(
