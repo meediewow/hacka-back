@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { DevModule } from '../dev/dev.module';
 import { TypeOrmModule } from '../db/db.module';
 import { UserModule } from '../user/user.module';
 import { AlsModule } from '../../als/als.module';
@@ -14,7 +13,6 @@ import { ReviewsModule } from '../reviews/reviews.module';
 @Module({
   imports: [
     AlsModule,
-    DevModule,
     UserModule,
     UploadModule,
     SessionModule,

@@ -73,10 +73,6 @@ export class OrderService {
       }
     });
 
-    if (!result.sitterId.equals(this.alsService.getStore().user._id)) {
-      throw new ForbiddenException();
-    }
-
     return {
       ...result,
       pets: await this.petService.getPetsByIds(result.petIds),
