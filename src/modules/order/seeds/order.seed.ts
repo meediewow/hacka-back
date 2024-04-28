@@ -26,10 +26,9 @@ export class OrderSeed implements OnApplicationBootstrap {
   private readonly orderRepository: OrderRepository;
 
   async onApplicationBootstrap(): Promise<void> {
-    // if (this.userRepository) {
-    //   return;
-    // }
-    //
+    if (this.userRepository) {
+      return;
+    }
     for (let i = 0; i < 510; i++) {
       await this.seed(faker.number.int({ min: 2, max: 10 }));
     }
