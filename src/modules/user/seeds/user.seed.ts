@@ -12,9 +12,9 @@ export class UserSeed implements OnApplicationBootstrap {
   private readonly userRepository: UserRepository;
 
   onApplicationBootstrap() {
-    if (this.userRepository) {
-      return;
-    }
+    // if (this.userRepository) {
+    //   return;
+    // }
     Object.keys(UserRole).forEach(async (role) => {
       await this.seed(UserRole[role], 10);
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -31,10 +31,10 @@ export class UserSeed implements OnApplicationBootstrap {
         type: 'Point',
         coordinates: faker.location.nearbyGPSCoordinate({
           origin: [
-            faker.location.longitude({ min: -70, max: 70 }),
+            faker.location.longitude({ min: 34.9, max: 35.2 }),
             faker.location.latitude({
-              min: -70,
-              max: 70
+              min: 33.0,
+              max: 33.1
             })
           ]
         })

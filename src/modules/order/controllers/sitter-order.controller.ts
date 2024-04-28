@@ -3,7 +3,7 @@ import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { GuardGet, GuardPost } from '../../user/decorators';
 import { OrderService } from '../order.service';
-import { OrderResponseDto } from '../dto/order.dto';
+import { BaseOrderRequest, OrderResponseDto } from '../dto/order.dto';
 import { ChangeOrderStatusRequestDto } from '../dto/change-order-status.dto';
 import { UserRole } from '../../user/types/user.types';
 
@@ -14,9 +14,9 @@ export class SitterOrderController {
   private readonly orderService: OrderService;
 
   @GuardPost([UserRole.Sitter], 'pay')
-  @ApiBody({ type: ChangeOrderStatusRequestDto })
+  @ApiBody({ type: BaseOrderRequest })
   @ApiResponse({ type: OrderResponseDto })
-  public async pay(@Body() body: ChangeOrderStatusRequestDto) {
+  public async pay(@Body() body: BaseOrderRequest) {
     return this.orderService.pay(body);
   }
 
