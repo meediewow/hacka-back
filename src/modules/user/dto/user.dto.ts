@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { Transform } from 'class-transformer';
@@ -61,5 +61,10 @@ export class UserUpdateRequestDto implements IUserUpdateData {
   @IsOptional()
   @IsNumber(undefined, { each: true })
   @ApiProperty({ type: 'number', required: false, isArray: true })
-  public coordinates: number[];
+  public coordinates?: number[];
+
+  @IsOptional()
+  @IsEnum(UserRole)
+  @ApiProperty({ type: 'enum' })
+  role?: UserRole;
 }

@@ -134,6 +134,13 @@ export class UserService {
 
   public async updateUserSafe(data: UserUpdateRequestDto) {
     const { user } = this.userAls.getStore();
+
+    if (data.role && user.roles.includes(data.role)) {
+      throw new BadRequestException('You already have this role');
+    } else if (data.role) {
+      user.roles.push(data.role);
+    }
+
     const updatedUser = userMutationMerge(user, data);
     const result = await this.userRepository.save(updatedUser);
 
