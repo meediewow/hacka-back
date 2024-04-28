@@ -17,7 +17,7 @@ export class ReviewsController {
   @ApiResponse({ type: SuccessDto })
   @ApiBody({ type: AddReviewRequestDto })
   public async addReview(@Body() body: AddReviewRequestDto) {
-    await this.reviewsService.addReview(body);
+    return this.reviewsService.addReview(body);
   }
 
   @Get('list/:targetId')

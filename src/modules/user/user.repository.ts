@@ -7,6 +7,7 @@ import { PetType } from '../pet/enum/pet-type.enum';
 
 import { UserEntity } from './entities';
 import { SittersRequestDto } from './dto/sitters.dto';
+import { UserRole } from './types/user.types';
 
 @Injectable()
 export class UserRepository extends MongoRepository<UserEntity> {
@@ -22,6 +23,11 @@ export class UserRepository extends MongoRepository<UserEntity> {
       ...(args?.coordinates?.length
         ? this.getCoordinatesAggregation(args.coordinates)
         : []),
+      {
+        $match: {
+          roles: { $in: [UserRole.Sitter] }
+        }
+      },
       ...(args?.category?.length
         ? this.getPetTypesAggregation(args.category)
         : []),
@@ -77,7 +83,9 @@ export class UserRepository extends MongoRepository<UserEntity> {
       },
       {
         $addFields: {
-          'originalDoc.rate': '$averageRate'
+          originalDoc: {
+            $mergeObjects: ['$originalDoc', { rate: '$averageRate' }]
+          }
         }
       },
       {

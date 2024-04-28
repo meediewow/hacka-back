@@ -5,6 +5,7 @@ import { IsNumber, IsObject, IsString } from 'class-validator';
 
 import { UserDto } from '../../user/dto';
 import { ReviewEntity } from '../entities/review.entity';
+import { UserEntity } from '../../user/entities';
 
 export class ReviewDto {
   @ApiProperty({ type: UserDto })
@@ -13,17 +14,30 @@ export class ReviewDto {
   @ApiProperty({ type: UserDto })
   author: UserDto;
 
-  @ApiProperty({ type: 'string' })
-  text: string;
-
-  @ApiProperty({ type: 'string' })
-  date: string;
+  @ApiProperty({ type: 'string', required: false })
+  text: string | null;
 
   @ApiProperty({ type: 'number' })
   rate: number;
 
   @ApiProperty({ type: 'string' })
   createdAt: Date;
+
+  constructor(
+    entity: ReviewEntity & { target: UserEntity; author: UserEntity }
+  ) {
+    this.target = UserDto.fromEntity(entity.target);
+    this.author = UserDto.fromEntity(entity.author);
+    this.text = entity.text;
+    this.rate = entity.rate;
+    this.createdAt = entity.createdAt;
+  }
+
+  static fromEntity(
+    entity: ReviewEntity & { target: UserEntity; author: UserEntity }
+  ) {
+    return new ReviewDto(entity);
+  }
 }
 
 export class ReviewsResponseDto {

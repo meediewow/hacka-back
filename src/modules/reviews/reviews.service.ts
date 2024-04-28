@@ -10,8 +10,9 @@ import {
 
 import { UserService } from '../user/services/user.service';
 import { AlsService } from '../../als/als.service';
+import { UserEntity } from '../user/entities';
 
-import { AddReviewRequestDto } from './dto/review.dto';
+import { AddReviewRequestDto, ReviewDto } from './dto/review.dto';
 import { ReviewEntity } from './entities/review.entity';
 
 @Injectable()
@@ -54,9 +55,9 @@ export class ReviewsService {
       throw new BadRequestException('User is not found');
     }
 
-    const initiator = this.alsService.getStore().user;
+    const author = this.alsService.getStore().user;
 
-    if (target._id.equals(initiator._id)) {
+    if (target._id.equals(author._id)) {
       throw new BadRequestException('You cannot leave a review for yourself');
     }
 
@@ -64,14 +65,56 @@ export class ReviewsService {
       rate: data.rate,
       text: data.text,
       targetId: target._id,
-      authorId: initiator._id
+      authorId: author._id
     });
 
-    await this.reviewsRepository.save(review);
+    const savedReview = await this.reviewsRepository.save(review);
+    return {
+      ...savedReview,
+      author,
+      target
+    };
   }
 
   public async getUserReviews(userId: string) {
-    const target = ObjectId.createFromHexString(userId);
-    return this.reviewsRepository.find({ where: { target } });
+    const targetId = ObjectId.createFromHexString(userId);
+    const reviews = (await this.reviewsRepository
+      .aggregate([
+        {
+          $match: {
+            targetId: targetId
+          }
+        },
+        {
+          $lookup: {
+            from: 'user_entity',
+            localField: 'authorId',
+            foreignField: '_id',
+            as: 'author'
+          }
+        },
+        {
+          $unwind: {
+            path: '$author'
+          }
+        },
+        {
+          $lookup: {
+            from: 'user_entity',
+            localField: 'targetId',
+            foreignField: '_id',
+            as: 'target'
+          }
+        },
+        {
+          $unwind: {
+            path: '$target'
+          }
+        }
+      ])
+      .toArray()) as Array<
+      ReviewEntity & { target: UserEntity; author: UserEntity }
+    >;
+    return reviews.map(ReviewDto.fromEntity);
   }
 }
