@@ -12,9 +12,6 @@ export class UserEntity implements IUser {
   public password: string;
 
   @Column()
-  public isSitter: boolean;
-
-  @Column()
   @Index()
   public identifier: string;
 
