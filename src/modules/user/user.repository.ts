@@ -35,7 +35,9 @@ export class UserRepository extends MongoRepository<UserEntity> {
       ...(args?.period ? this.getPeriodAggregation(args.period) : []),
       ...this.getOrdersCountAggregation(),
       ...this.getAvgRateAggregation(),
-      ...(args?.sorter ? [{ $sort: args.sorter.toOrder() }] : [])
+      ...(args?.sorter
+        ? [{ $sort: args.sorter.toOrder() }]
+        : [{ $sort: { rate: -1 } }])
     ]).toArray();
   }
 
@@ -85,7 +87,10 @@ export class UserRepository extends MongoRepository<UserEntity> {
       {
         $addFields: {
           originalDoc: {
-            $mergeObjects: ['$originalDoc', { rate: '$averageRate' }]
+            $mergeObjects: [
+              '$originalDoc',
+              { rate: { $ifNull: ['$averageRate', 0] } }
+            ]
           }
         }
       },

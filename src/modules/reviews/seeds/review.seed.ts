@@ -20,9 +20,7 @@ export class ReviewSeed implements OnApplicationBootstrap {
   private userRepository: UserRepository;
 
   async onApplicationBootstrap(): Promise<void> {
-    // for (let i = 0; i < 50; i++) {
-    //   await this.seed(faker.number.int({ min: 3, max: 10 }));
-    // }
+    // await this.seed(faker.number.int({ min: 3, max: 10 }));
   }
 
   async seed(count: number): Promise<void> {
@@ -41,29 +39,31 @@ export class ReviewSeed implements OnApplicationBootstrap {
       throw new NotFoundException();
     }
 
-    const sitter = await this.userRepository
+    const sitters = await this.userRepository
       .aggregate([
         {
           $match: {
             roles: { $in: [UserRole.Sitter] }
           }
         },
-        { $sample: { size: 1 } }
+        { $sample: { size: 100 } }
       ])
-      .next();
+      .toArray();
 
-    if (!sitter) {
-      throw new NotFoundException();
+    let result: Partial<ReviewEntity>[] = [];
+
+    for (const sitter of sitters) {
+      const getReview: () => Partial<ReviewEntity> = () => ({
+        text: faker.lorem.sentence(),
+        rate: faker.number.int({ min: 1, max: 5 }),
+        authorId: client._id,
+        targetId: sitter._id
+      });
+
+      const data = Array.from({ length: count }, getReview);
+      result = result.concat(data);
     }
 
-    const getReview: () => Partial<ReviewEntity> = () => ({
-      text: faker.lorem.sentence(),
-      rate: faker.number.int({ min: 1, max: 5 }),
-      authorId: client._id,
-      targetId: sitter._id
-    });
-
-    const data = Array.from({ length: count }, getReview);
-    await this.reviewRepository.save(data);
+    await this.reviewRepository.save(result);
   }
 }

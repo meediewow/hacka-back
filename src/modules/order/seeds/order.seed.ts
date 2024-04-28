@@ -5,7 +5,6 @@ import {
   OnApplicationBootstrap
 } from '@nestjs/common';
 import { faker } from '@faker-js/faker';
-import { ObjectId } from 'mongodb';
 import { DateTime } from 'luxon';
 
 import { OrderEntity } from '../entities/order.entity';
@@ -29,12 +28,10 @@ export class OrderSeed implements OnApplicationBootstrap {
     if (this.userRepository) {
       return;
     }
-    for (let i = 0; i < 510; i++) {
-      await this.seed(faker.number.int({ min: 2, max: 10 }));
-    }
+    await this.seed();
   }
 
-  async seed(count: number): Promise<void> {
+  async seed(): Promise<void> {
     const client = await this.userRepository
       .aggregate([
         {
@@ -52,57 +49,57 @@ export class OrderSeed implements OnApplicationBootstrap {
 
     const clientPets = await this.petService.getPets(client);
 
-    const sitter = await this.userRepository
+    const sitters = await this.userRepository
       .aggregate([
         {
           $match: {
-            _id: {
-              $in: [
-                '662e45ec52b46ba97150d81e',
-                '662e45ec52b46ba97150d81f',
-                '662e45ec52b46ba97150d820',
-                '662e45ec52b46ba97150d821',
-                '662e45ec52b46ba97150d823',
-                '662e45ec52b46ba97150d824'
-              ].map((id) => new ObjectId(id))
-            },
             roles: { $in: [UserRole.Sitter] }
           }
         },
-        { $sample: { size: 1 } }
+        { $sample: { size: 100 } }
       ])
-      .next();
+      .toArray();
 
-    if (!sitter) {
-      throw new NotFoundException();
+    if (sitters.length === 0) {
+      return;
     }
 
-    const getOrder: () => Partial<OrderEntity> = () => {
-      const startDate = faker.date.between({
-        from: DateTime.now().minus({ year: 2 }).toJSDate(),
-        to: DateTime.now().minus({ year: 1 }).toJSDate()
-      }); // Генерируем случайную прошедшую дату за последние 2 года
+    let result: Partial<OrderEntity>[] = [];
 
-      const _startDate = DateTime.fromJSDate(startDate);
-      const endData = _startDate
-        .plus({ days: faker.number.int({ min: 1, max: 14 }) })
-        .toJSDate();
+    for (const sitter of sitters) {
+      const getOrder: () => Partial<OrderEntity> = () => {
+        const startDate = faker.date.between({
+          from: DateTime.now().minus({ year: 2 }).toJSDate(),
+          to: DateTime.now().minus({ year: 1 }).toJSDate()
+        }); // Генерируем случайную прошедшую дату за последние 2 года
 
-      return {
-        _id: new ObjectId(),
-        status: this.getRandomEnumValue(Status),
-        clientId: client._id,
-        isPayed: Math.random() > 0.5,
-        price: faker.number.float({ min: 10, max: 100 }),
-        petIds: clientPets.map((pet) => pet._id),
-        startAt: startDate,
-        finishAt: endData,
-        sitterId: sitter._id
+        const _startDate = DateTime.fromJSDate(startDate);
+        const endData = _startDate
+          .plus({ days: faker.number.int({ min: 1, max: 14 }) })
+          .toJSDate();
+
+        return {
+          status: this.getRandomEnumValue(Status),
+          clientId: client._id,
+          isPayed: Math.random() > 0.5,
+          price: faker.number.float({ min: 10, max: 100 }),
+          petIds: clientPets.map((pet) => pet._id),
+          startAt: startDate,
+          finishAt: endData,
+          sitterId: sitter._id
+        };
       };
-    };
 
-    const data = Array.from({ length: count }, getOrder);
-    await this.orderRepository.save(data);
+      result = [
+        ...result,
+        ...Array.from(
+          { length: faker.number.int({ min: 2, max: 5 }) },
+          getOrder
+        )
+      ];
+    }
+
+    await this.orderRepository.save(result);
   }
 
   private getRandomEnumValue<T>(anEnum: T): T[keyof T] {
