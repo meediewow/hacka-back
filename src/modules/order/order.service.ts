@@ -56,16 +56,18 @@ export class OrderService {
 
     return {
       ...order,
-      sitter: UserDto.fromEntity(this.alsService.getStore().user),
+      sitter: await this.userService.findUser({ id: order.sitterId }),
       client: await this.userService.findUser({ id: order.clientId }),
       pets: await this.petService.getPetsByIds(order.petIds)
     };
   }
 
   async getSitterOrderById(id: string): Promise<OrderResponseDto> {
-    const result = await this.orderRepository.getFullOrderById(
-      ObjectId.createFromHexString(id)
-    );
+    const result = await this.orderRepository.findOneOrFail({
+      where: {
+        _id: ObjectId.createFromHexString(id)
+      }
+    });
 
     if (!result.sitterId.equals(this.alsService.getStore().user._id)) {
       throw new ForbiddenException();
@@ -73,15 +75,18 @@ export class OrderService {
 
     return {
       ...result,
-      sitter: UserDto.fromEntity(result.sitter),
-      client: UserDto.fromEntity(result.client)
+      pets: await this.petService.getPetsByIds(result.petIds),
+      sitter: await this.userService.findUser({ id: result.sitterId }),
+      client: await this.userService.findUser({ id: result.clientId })
     };
   }
 
   async getClientOrderById(id: string): Promise<OrderResponseDto> {
-    const result = await this.orderRepository.getFullOrderById(
-      ObjectId.createFromHexString(id)
-    );
+    const result = await this.orderRepository.findOneOrFail({
+      where: {
+        _id: ObjectId.createFromHexString(id)
+      }
+    });
 
     if (!result.clientId.equals(this.alsService.getStore().user._id)) {
       throw new ForbiddenException();
@@ -89,8 +94,9 @@ export class OrderService {
 
     return {
       ...result,
-      sitter: UserDto.fromEntity(result.sitter),
-      client: UserDto.fromEntity(result.client)
+      pets: await this.petService.getPetsByIds(result.petIds),
+      sitter: await this.userService.findUser({ id: result.sitterId }),
+      client: await this.userService.findUser({ id: result.clientId })
     };
   }
 
@@ -245,7 +251,7 @@ export class OrderService {
     );
     return {
       ...order,
-      client: UserDto.fromEntity(client.user),
+      client: await this.userService.findUser({ id: order.clientId }),
       sitter,
       pets
     };

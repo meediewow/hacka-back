@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsObject, IsString } from 'class-validator';
+import { IsNumber, IsObject, IsString, Max, Min } from 'class-validator';
 
 import { UserDto } from '../../user/dto';
 import { ReviewEntity } from '../entities/review.entity';
@@ -18,6 +18,8 @@ export class ReviewDto {
   text: string | null;
 
   @ApiProperty({ type: 'number' })
+  @Max(5)
+  @Min(1)
   rate: number;
 
   @ApiProperty({ type: 'string' })
