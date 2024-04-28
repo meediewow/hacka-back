@@ -49,7 +49,9 @@ export class OrderService {
     const order = await this.orderRepository.findOneOrFail({
       where: { _id: args.orderId }
     });
-    if (order.isPayed || order.status !== Status.PROGRESS) {
+
+    const ALLOWED_STATUSES = [Status.CONFIRMED, Status.PROGRESS];
+    if (order.isPayed || !ALLOWED_STATUSES.includes(order.status)) {
       throw new BadRequestException('Order already payed or canceled');
     }
 
