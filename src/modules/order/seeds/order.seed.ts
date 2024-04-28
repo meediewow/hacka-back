@@ -25,10 +25,7 @@ export class OrderSeed implements OnApplicationBootstrap {
   private readonly orderRepository: OrderRepository;
 
   async onApplicationBootstrap(): Promise<void> {
-    if (this.userRepository) {
-      return;
-    }
-    await this.seed();
+    // await this.seed();
   }
 
   async seed(): Promise<void> {
