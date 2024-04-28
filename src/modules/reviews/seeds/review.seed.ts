@@ -20,9 +20,9 @@ export class ReviewSeed implements OnApplicationBootstrap {
   private userRepository: UserRepository;
 
   async onApplicationBootstrap(): Promise<void> {
-    for (let i = 0; i < 5; i++) {
-      await this.seed(faker.number.int({ min: 3, max: 10 }));
-    }
+    // for (let i = 0; i < 50; i++) {
+    //   await this.seed(faker.number.int({ min: 3, max: 10 }));
+    // }
   }
 
   async seed(count: number): Promise<void> {
