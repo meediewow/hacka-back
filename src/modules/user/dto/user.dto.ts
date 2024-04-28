@@ -25,7 +25,7 @@ export class UserDto {
   public profile: ProfileDto;
 
   @ApiProperty({ type: 'number', required: false, isArray: true })
-  public coordinates: number[];
+  public coordinates?: number[];
 
   @IsNumber()
   @ApiProperty({ type: 'number' })
@@ -41,6 +41,7 @@ export class UserDto {
     this.pets = data.pets;
     this.profile = data.profile;
     this.rate = data.rate ?? 0;
+    this.coordinates = data.location?.coordinates;
   }
 
   static fromEntity(entity: UserEntity & { pets?: PetResponseDto[] }): UserDto {

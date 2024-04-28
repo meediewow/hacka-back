@@ -22,10 +22,10 @@ export class UserRepository extends MongoRepository<UserEntity> {
       ...(args?.coordinates?.length
         ? this.getCoordinatesAggregation(args.coordinates)
         : []),
-      ...(args?.period ? this.getPeriodAggregation(args.period) : []),
       ...(args?.category?.length
         ? this.getPetTypesAggregation(args.category)
         : []),
+      ...(args?.period ? this.getPeriodAggregation(args.period) : []),
       ...this.getOrdersCountAggregation(),
       ...this.getAvgRateAggregation(),
       ...(args?.sorter ? [{ $sort: args.sorter.toOrder() }] : [])
@@ -126,8 +126,7 @@ export class UserRepository extends MongoRepository<UserEntity> {
         }
       },
       {
-        $project: {
-          userId: 1,
+        $addFields: {
           orders: {
             $filter: {
               input: '$orders',
@@ -145,12 +144,6 @@ export class UserRepository extends MongoRepository<UserEntity> {
       {
         $match: {
           orders: { $size: 0 }
-        }
-      },
-      {
-        $project: {
-          userId: 1,
-          orders: 1
         }
       }
     ];
