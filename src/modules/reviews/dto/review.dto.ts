@@ -3,31 +3,27 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNumber, IsObject, IsString } from 'class-validator';
 
+import { UserDto } from '../../user/dto';
+import { ReviewEntity } from '../entities/review.entity';
+
 export class ReviewDto {
-  @IsString()
-  @ApiProperty({ type: 'string', required: true })
-  @Transform(({ value }) => String(value))
-  target: ObjectId;
+  @ApiProperty({ type: UserDto })
+  target: UserDto;
 
-  @IsString()
-  @ApiProperty({ type: 'string', required: true })
-  name: string;
+  @ApiProperty({ type: UserDto })
+  author: UserDto;
 
-  @IsString()
-  @ApiProperty({ type: 'string', required: true })
-  photo: string;
-
-  @IsString()
-  @ApiProperty({ type: 'string', required: true })
+  @ApiProperty({ type: 'string' })
   text: string;
 
-  @IsString()
-  @ApiProperty({ type: 'string', required: true })
+  @ApiProperty({ type: 'string' })
   date: string;
 
-  @IsNumber()
-  @ApiProperty({ type: 'number', required: true })
+  @ApiProperty({ type: 'number' })
   rate: number;
+
+  @ApiProperty({ type: 'string' })
+  createdAt: Date;
 }
 
 export class ReviewsResponseDto {
@@ -35,24 +31,17 @@ export class ReviewsResponseDto {
   list: ReviewDto[];
 }
 
-export class ReviewsRequestDto {
-  @IsString()
-  @ApiProperty({ type: 'string', required: true })
-  @Transform(({ value }) => ObjectId.createFromHexString(value))
-  id: ObjectId;
-}
-
 export class AddReviewRequestDto {
   @IsObject()
-  @ApiProperty({ type: 'string', required: true })
+  @ApiProperty({ type: 'string' })
   @Transform(({ value }) => ObjectId.createFromHexString(value))
-  target: ObjectId;
+  targetId: ReviewEntity['targetId'];
 
   @IsString()
-  @ApiProperty({ type: 'string', required: true })
-  text: string;
+  @ApiProperty({ type: 'string', required: false })
+  text?: string;
 
   @IsNumber()
-  @ApiProperty({ type: 'number', required: true })
+  @ApiProperty({ type: 'number' })
   rate: number;
 }

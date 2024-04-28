@@ -1,5 +1,4 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { ObjectId } from 'mongodb';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -35,13 +34,13 @@ export class AddPetsRequestDto {
 export class RemovePetRequestDto {
   @ApiProperty({ type: 'string', example: '662d0cc3387c017a98c6a081' })
   @Transform(({ value }) => String(value))
-  _id: ObjectId;
+  _id: PetEntity['_id'];
 }
 
 export class PetResponseDto implements Partial<PetEntity> {
   @ApiProperty({ type: 'string', example: '662d0cc3387c017a98c6a081' })
   @Transform(({ value }) => String(value))
-  _id: ObjectId;
+  _id: PetEntity['_id'];
 
   @ApiProperty({ type: 'number', example: 1 })
   type: PetType;
@@ -51,4 +50,7 @@ export class PetResponseDto implements Partial<PetEntity> {
 
   @ApiProperty({ type: 'string', example: 'Fluffy' })
   name: string | null = null;
+
+  @ApiProperty({ type: 'string', example: 'Any comment', required: false })
+  comment: string | null = null;
 }

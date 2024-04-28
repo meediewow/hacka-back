@@ -1,7 +1,12 @@
 import { ObjectId } from 'mongodb';
 import { MongoRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable
+} from '@nestjs/common';
 
 import { UserService } from '../user/services/user.service';
 import { AlsService } from '../../als/als.service';
@@ -17,12 +22,12 @@ export class ReviewsService {
   @Inject(AlsService)
   private readonly alsService: AlsService;
 
-  @Inject(UserService)
+  @Inject(forwardRef(() => UserService))
   private userService: UserService;
 
   public async addReview(data: AddReviewRequestDto) {
-    const target = this.userService.findUser({
-      id: data.target
+    const target = await this.userService.findUser({
+      id: data.targetId
     });
 
     if (!target) {
@@ -31,17 +36,14 @@ export class ReviewsService {
 
     const initiator = this.alsService.getStore().user;
 
-    const review = new ReviewEntity();
-
-    review.text = data.text;
-    review.rate = data.rate;
-    review.target = data.target;
-    review.date = new Date().toISOString();
-    review.name = initiator.profile?.name ?? '';
-    review.photo = initiator.profile?.photo ?? '';
+    const review = new ReviewEntity({
+      rate: data.rate,
+      text: data.text,
+      targetId: target._id,
+      authorId: initiator._id
+    });
 
     await this.reviewsRepository.save(review);
-    await this.userService.updateUserRating(data.target, data.rate);
   }
 
   public async getUserReviews(userId: string) {

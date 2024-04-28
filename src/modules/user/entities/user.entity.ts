@@ -33,8 +33,5 @@ export class UserEntity implements IUser {
   } | null;
 
   @Column()
-  public rate: number;
-
-  @Column()
   public about?: string;
 }

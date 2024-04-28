@@ -1,6 +1,5 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
 import { Transform } from 'class-transformer';
 
 import { IUserUpdateData, UserRole } from '../types/user.types';
@@ -13,7 +12,7 @@ export class UserDto {
   @IsString()
   @ApiProperty({ type: 'string' })
   @Transform(({ value }) => String(value))
-  public _id: ObjectId;
+  public _id: UserEntity['_id'];
 
   @ApiProperty({ type: 'number', isArray: true })
   public roles: UserRole[];

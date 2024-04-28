@@ -30,14 +30,18 @@ export class CheckToken implements CanActivate {
       context.getHandler()
     );
 
-    const store = this.als.getStore();
+    try {
+      const store = this.als.getStore();
 
-    if (!store?.user) {
+      if (!store?.user) {
+        return false;
+      }
+
+      const rolesCheck = roles.map((role) => this.hasRole(role, store?.user));
+      return rolesCheck.includes(true);
+    } catch (e) {
       return false;
     }
-
-    const rolesCheck = roles.map((role) => this.hasRole(role, store?.user));
-    return rolesCheck.includes(true);
   }
 
   private hasRole(role: UserRole, user: UserEntity): boolean {

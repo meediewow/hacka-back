@@ -21,6 +21,7 @@ import { IUserAuthData, UserRole } from '../types/user.types';
 import { userMutationMerge } from '../utils/userMerge.utils';
 import { AlsService } from '../../../als/als.service';
 import { UserRepository } from '../user.repository';
+import { ReviewsService } from '../../reviews/reviews.service';
 
 @Injectable()
 export class UserService {
@@ -35,6 +36,9 @@ export class UserService {
 
   @Inject(forwardRef(() => OrderService))
   private orderService!: OrderService;
+
+  @Inject(forwardRef(() => ReviewsService))
+  private readonly reviewsService: ReviewsService;
 
   public async findByIdOrFail(_id: UserEntity['_id'] | string) {
     const id =
@@ -101,7 +105,6 @@ export class UserService {
 
     const userEntity = new UserEntity();
 
-    userEntity.rate = 0;
     userEntity.profile = data.profile;
     userEntity.about = data.about ?? '';
     userEntity.identifier = data.identifier;
@@ -124,10 +127,9 @@ export class UserService {
     await this.userRepository.save(user);
   }
 
-  public async updateUserRating(_id: ObjectId, rating: number) {
+  public async updateUserRating(_id: ObjectId) {
     const user = await this.findByIdOrFail(_id);
 
-    user.rate = user.rate ? (user.rate + rating) / 2 : rating;
     await this.addOrdersCountToUser(user);
     await this.userRepository.save(user);
   }
