@@ -5,7 +5,8 @@ import {
   BadRequestException,
   forwardRef,
   Inject,
-  Injectable
+  Injectable,
+  UnauthorizedException
 } from '@nestjs/common';
 
 import { encryptPassword } from '../../../crypto';
@@ -59,23 +60,23 @@ export class UserService {
   }
 
   public async authUser(data: IUserAuthData): Promise<ITokenContainer> {
-    const user = await this.userRepository.findOneOrFail({
-      where: { identifier: data.identifier }
-    });
+    try {
+      const user = await this.userRepository.findOneOrFail({
+        where: { identifier: data.identifier }
+      });
 
-    if (!user) {
-      throw new BadRequestException('User is not exists');
+      const passwordHash = encryptPassword(data.password);
+
+      if (user.password !== passwordHash) {
+        throw new Error('Incorrect login/password');
+      }
+
+      const token = createTokenForUser(user);
+
+      return { token };
+    } catch (e) {
+      throw new UnauthorizedException();
     }
-
-    const passwordHash = encryptPassword(data.password);
-
-    if (user.password !== passwordHash) {
-      throw new BadRequestException('Incorrect login/password');
-    }
-
-    const token = createTokenForUser(user);
-
-    return { token };
   }
 
   public async findUser({ id, identifier }: IFindUserData) {
