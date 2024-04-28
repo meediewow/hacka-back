@@ -51,7 +51,11 @@ export class UserDto {
 export class UserUpdateRequestDto implements IUserUpdateData {
   @IsString()
   @IsOptional()
-  @ApiProperty({ type: 'string', example: 'new text about me' })
+  @ApiProperty({
+    type: 'string',
+    example: 'new text about me',
+    required: false
+  })
   public about?: string;
 
   @IsOptional()
@@ -65,6 +69,6 @@ export class UserUpdateRequestDto implements IUserUpdateData {
 
   @IsOptional()
   @IsEnum(UserRole)
-  @ApiProperty({ type: 'enum' })
+  @ApiProperty({ type: 'enum', enum: UserRole, required: false })
   role?: UserRole;
 }
