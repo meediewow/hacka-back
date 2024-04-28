@@ -124,7 +124,7 @@ export class UserRepository extends MongoRepository<UserEntity> {
     ];
   }
 
-  private getPeriodAggregation(period: PeriodDto) {
+  private getPeriodAggregation(period?: PeriodDto) {
     return [
       {
         $lookup: {
@@ -142,12 +142,16 @@ export class UserRepository extends MongoRepository<UserEntity> {
               as: 'order',
               cond: {
                 $and: [
-                  {
-                    $or: [
-                      { $lt: ['$$order.finishAt', period.start] },
-                      { $gt: ['$$order.startAt', period.end] }
-                    ]
-                  },
+                  period
+                    ? {
+                        $or: [
+                          { $lt: ['$$order.finishAt', period.start] },
+                          { $gt: ['$$order.startAt', period.end] }
+                        ]
+                      }
+                    : {
+                        $gt: ['$$order.startAt', new Date()]
+                      },
                   {
                     $in: ['$$order.status', [Status.PROGRESS, Status.CONFIRMED]]
                   }

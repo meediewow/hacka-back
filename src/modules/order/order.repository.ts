@@ -16,28 +16,6 @@ export class OrderRepository extends MongoRepository<OrderEntity> {
     super(OrderEntity, datasource.manager);
   }
 
-  async getFullOrderById(
-    id: OrderEntity['_id']
-  ): Promise<
-    OrderEntity & { sitter: UserEntity; client: UserEntity; pets: PetEntity[] }
-  > {
-    const cursor = this.aggregate([
-      {
-        $match: {
-          _id: id
-        }
-      },
-      ...this.getLookupSitterAndClientStages()
-    ]).next();
-    return cursor as Promise<
-      OrderEntity & {
-        sitter: UserEntity;
-        client: UserEntity;
-        pets: PetEntity[];
-      }
-    >;
-  }
-
   getSitterOrders(sitterId: OrderEntity['sitterId']) {
     return this.aggregate([
       {
