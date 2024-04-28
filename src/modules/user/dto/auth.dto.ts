@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsEmail,
   IsNumber,
   IsOptional,
   IsString,
@@ -14,7 +13,6 @@ import { ProfileDto } from './profile.dto';
 
 export class AuthRequestDto implements IUserAuthData {
   @ApiProperty({ type: 'string', example: 'i.am.user@example.com' })
-  @IsEmail()
   public identifier: string;
 
   @IsString()
