@@ -249,6 +249,18 @@ export class OrderService {
     };
   }
 
+  async calculatePriceForClient(data: OrderRequestDto) {
+    const sitter = await this.userService.findUser({ id: data.sitterId });
+    const pets = await this.petService.getPetsByIds(data.petIds);
+    return {
+      price: this.calculatePrice(
+        sitter,
+        pets.map((pet) => pet.type),
+        data.period
+      )
+    };
+  }
+
   calculatePrice(
     sitter: Pick<UserEntity, 'profile'>,
     petTypes: PetType[],

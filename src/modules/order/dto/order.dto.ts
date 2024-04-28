@@ -34,7 +34,15 @@ export class OrderRequestDto implements Partial<OrderEntity> {
   petIds: ObjectId[];
 }
 
-export class OrderResponseDto implements Partial<OrderEntity> {
+export class OrderPrice {
+  @ApiProperty({ type: 'number', example: 0 })
+  price: number;
+}
+
+export class OrderResponseDto
+  extends OrderPrice
+  implements Partial<OrderEntity>
+{
   @ApiProperty({ type: 'string', example: '616f9b3b8f4b3b001f3b3b3b' })
   @Transform(({ value }) => value.toHexString())
   _id: ObjectId;
@@ -64,9 +72,6 @@ export class OrderResponseDto implements Partial<OrderEntity> {
 
   @ApiProperty({ type: 'boolean', example: false })
   isPayed: boolean;
-
-  @ApiProperty({ type: 'number', example: 0 })
-  price: number;
 
   @ApiProperty({ type: 'string', example: '2021-10-20T00:00:00.000Z' })
   @Transform(({ value }) => value.toISOString())

@@ -4,7 +4,11 @@ import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GuardGet, GuardPost } from '../../user/decorators';
 import { UserRole } from '../../user/types/user.types';
 import { OrderService } from '../order.service';
-import { OrderRequestDto, OrderResponseDto } from '../dto/order.dto';
+import {
+  OrderPrice,
+  OrderRequestDto,
+  OrderResponseDto
+} from '../dto/order.dto';
 import { ChangeOrderStatusRequestDto } from '../dto/change-order-status.dto';
 
 @ApiTags('Client order')
@@ -38,5 +42,12 @@ export class ClientOrderController {
   @ApiResponse({ type: OrderResponseDto })
   public async getOrder(@Param('id') id: string) {
     return this.orderService.getClientOrderById(id);
+  }
+
+  @GuardPost([UserRole.Client], '/calculate-price')
+  @ApiBody({ type: OrderRequestDto })
+  @ApiResponse({ type: OrderPrice })
+  public async getPrice(@Body() body: OrderRequestDto) {
+    return this.orderService.calculatePriceForClient(body);
   }
 }
