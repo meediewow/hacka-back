@@ -27,6 +27,7 @@ export class UserRepository extends MongoRepository<UserEntity> {
         ? this.getPetTypesAggregation(args.category)
         : []),
       ...this.getOrdersCountAggregation(),
+      ...this.getAvgRateAggregation(),
       ...(args?.sorter ? [{ $sort: args.sorter.toOrder() }] : [])
     ]).toArray();
   }
@@ -45,6 +46,42 @@ export class UserRepository extends MongoRepository<UserEntity> {
         $addFields: {
           'profile.orderCount': { $size: '$allOrders' }
         }
+      }
+    ];
+  }
+
+  private getAvgRateAggregation() {
+    return [
+      {
+        $lookup: {
+          from: 'review_entity',
+          localField: '_id',
+          foreignField: 'targetId',
+          as: 'reviews'
+        }
+      },
+      {
+        $unwind: {
+          path: '$reviews',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $group: {
+          _id: '$_id',
+          originalDoc: { $first: '$$ROOT' },
+          averageRate: {
+            $avg: '$reviews.rate'
+          }
+        }
+      },
+      {
+        $addFields: {
+          'originalDoc.rate': '$averageRate'
+        }
+      },
+      {
+        $replaceRoot: { newRoot: '$originalDoc' }
       }
     ];
   }

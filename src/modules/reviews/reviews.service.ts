@@ -25,6 +25,26 @@ export class ReviewsService {
   @Inject(forwardRef(() => UserService))
   private userService: UserService;
 
+  getUserRate(targetId: ReviewEntity['targetId']) {
+    return this.reviewsRepository
+      .aggregate([
+        {
+          $match: {
+            targetId
+          }
+        },
+        {
+          $group: {
+            _id: '$targetId',
+            rate: {
+              $avg: '$rate'
+            }
+          }
+        }
+      ])
+      .next();
+  }
+
   public async addReview(data: AddReviewRequestDto) {
     const target = await this.userService.findUser({
       id: data.targetId
@@ -35,6 +55,10 @@ export class ReviewsService {
     }
 
     const initiator = this.alsService.getStore().user;
+
+    if (target._id.equals(initiator._id)) {
+      throw new BadRequestException('You cannot leave a review for yourself');
+    }
 
     const review = new ReviewEntity({
       rate: data.rate,

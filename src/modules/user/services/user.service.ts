@@ -51,6 +51,8 @@ export class UserService {
 
   public async getMeUser() {
     const { user } = this.userAls.getStore();
+
+    await this.addRateToUser(user);
     const pets = await this.petService.getPets(user);
     return UserDto.fromEntity({ ...user, pets });
   }
@@ -88,6 +90,7 @@ export class UserService {
 
     const user = await this.userRepository.findOneOrFail({ where });
     await this.addOrdersCountToUser(user);
+    await this.addRateToUser(user);
     return UserDto.fromEntity({
       ...user,
       pets: await this.petService.getPets(user)
@@ -127,13 +130,6 @@ export class UserService {
     await this.userRepository.save(user);
   }
 
-  public async updateUserRating(_id: ObjectId) {
-    const user = await this.findByIdOrFail(_id);
-
-    await this.addOrdersCountToUser(user);
-    await this.userRepository.save(user);
-  }
-
   public async updateUserSafe(data: UserUpdateRequestDto) {
     const { user } = this.userAls.getStore();
 
@@ -150,6 +146,13 @@ export class UserService {
       ...result,
       pets: await this.petService.getPets(result)
     });
+  }
+
+  private async addRateToUser(user: UserEntity): Promise<Partial<UserDto>> {
+    const reviews = await this.reviewsService.getUserRate(user._id);
+
+    user['rate'] = reviews?.rate ?? 0;
+    return user;
   }
 
   private async addOrdersCountToUser(user: UserEntity) {

@@ -35,11 +35,12 @@ export class UserDto {
   @ApiProperty({ type: 'string' })
   public about?: string;
 
-  constructor(data: UserEntity & { pets: PetResponseDto[] }) {
+  constructor(data: UserEntity & { pets: PetResponseDto[]; rate?: number }) {
     this._id = data._id;
     this.roles = data.roles;
     this.pets = data.pets;
     this.profile = data.profile;
+    this.rate = data.rate ?? 0;
   }
 
   static fromEntity(entity: UserEntity & { pets?: PetResponseDto[] }): UserDto {
