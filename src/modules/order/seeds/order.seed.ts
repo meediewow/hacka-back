@@ -5,6 +5,7 @@ import {
   OnApplicationBootstrap
 } from '@nestjs/common';
 import { faker } from '@faker-js/faker';
+import { ObjectId } from 'mongodb';
 
 import { OrderEntity } from '../entities/order.entity';
 import { Status } from '../enums/status.enum';
@@ -28,8 +29,8 @@ export class OrderSeed implements OnApplicationBootstrap {
       return;
     }
 
-    for (let i = 0; i < 50; i++) {
-      await this.seed(faker.number.int({ min: 5, max: 15 }));
+    for (let i = 0; i < 5; i++) {
+      await this.seed(faker.number.int({ min: 5, max: 3 }));
     }
   }
 
@@ -68,8 +69,8 @@ export class OrderSeed implements OnApplicationBootstrap {
 
     const startDate = faker.date.past(2); // Генерируем случайную прошедшую дату за последние 2 года
 
-    const order: Partial<OrderEntity> = {
-      _id: undefined,
+    const getOrder: () => Partial<OrderEntity> = () => ({
+      _id: new ObjectId(),
       status: this.getRandomEnumValue(Status),
       clientId: client._id,
       isPayed: Math.random() > 0.5,
@@ -81,12 +82,10 @@ export class OrderSeed implements OnApplicationBootstrap {
           faker.datatype.number({ min: 1, max: 14 }) * 24 * 60 * 60 * 1000
       ),
       sitterId: sitter._id
-    };
+    });
 
-    const data = Array.from({ length: count }, () => order);
-    for (const order of data) {
-      await this.orderRepository.save(order);
-    }
+    const data = Array.from({ length: count }, getOrder);
+    await this.orderRepository.save(data);
   }
 
   private getRandomEnumValue<T>(anEnum: T): T[keyof T] {

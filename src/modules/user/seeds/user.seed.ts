@@ -22,7 +22,7 @@ export class UserSeed implements OnApplicationBootstrap {
   }
 
   async seed(role: UserRole, count: number) {
-    const user: Partial<UserEntity> = {
+    const user: () => Partial<UserEntity> = () => ({
       roles: [role],
       password: faker.internet.password(),
       identifier: faker.internet.email(),
@@ -30,7 +30,13 @@ export class UserSeed implements OnApplicationBootstrap {
       location: {
         type: 'Point',
         coordinates: faker.location.nearbyGPSCoordinate({
-          origin: [faker.location.longitude(), faker.location.latitude()]
+          origin: [
+            faker.location.longitude({ min: -70, max: 70 }),
+            faker.location.latitude({
+              min: -70,
+              max: 70
+            })
+          ]
         })
       },
       profile: {
@@ -40,16 +46,16 @@ export class UserSeed implements OnApplicationBootstrap {
           country: faker.location.country()
         },
         tariff: Object.keys(PetType).map((key) => ({
-          category: PetType[key] as PetType,
+          category: PetType[key],
           pricePerDay: faker.number.int()
         })),
         communication: {
           phone: faker.phone.number()
         }
       }
-    };
+    });
 
-    const data = Array.from({ length: count }, () => user);
+    const data = Array.from({ length: count }, user);
     await this.userRepository.insertMany(data);
   }
 }
