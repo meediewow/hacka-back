@@ -16,22 +16,22 @@ export class ReviewEntity {
 
   @Column()
   @Index()
-  creatorId: UserEntity['_id'];
+  authorId: UserEntity['_id'];
 
-  @Column()
-  text: string;
+  @Column({ nullable: true })
+  text: string | null = null;
 
   @Column()
   rate: number;
 
   @Column()
   @Index()
-  recipientId: UserEntity['_id'];
+  targetId: UserEntity['_id'];
 
   @CreateDateColumn()
   createdAt: Date;
 
-  constructor(data: Omit<ReviewEntity, '_id' | 'createdAt'>) {
+  constructor(data: Partial<Omit<ReviewEntity, '_id' | 'createdAt'>>) {
     Object.assign(this, data);
   }
 }

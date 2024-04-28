@@ -21,6 +21,7 @@ import { IUserAuthData, UserRole } from '../types/user.types';
 import { userMutationMerge } from '../utils/userMerge.utils';
 import { AlsService } from '../../../als/als.service';
 import { UserRepository } from '../user.repository';
+import { ReviewsService } from '../../reviews/reviews.service';
 
 @Injectable()
 export class UserService {
@@ -36,6 +37,9 @@ export class UserService {
   @Inject(forwardRef(() => OrderService))
   private orderService!: OrderService;
 
+  @Inject(forwardRef(() => ReviewsService))
+  private readonly reviewsService: ReviewsService;
+
   public async findByIdOrFail(_id: UserEntity['_id'] | string) {
     const id =
       typeof _id === 'string' ? ObjectId.createFromHexString(_id) : _id;
@@ -48,6 +52,8 @@ export class UserService {
   public async getMeUser() {
     const { user } = this.userAls.getStore();
     await this.addOrdersCountToUser(user);
+
+    await this.addRateToUser(user);
     const pets = await this.petService.getPets(user);
     return UserDto.fromEntity({ ...user, pets });
   }
@@ -85,6 +91,7 @@ export class UserService {
 
     const user = await this.userRepository.findOneOrFail({ where });
     await this.addOrdersCountToUser(user);
+    await this.addRateToUser(user);
     return UserDto.fromEntity({
       ...user,
       pets: await this.petService.getPets(user)
@@ -102,7 +109,6 @@ export class UserService {
 
     const userEntity = new UserEntity();
 
-    userEntity.rate = 0;
     userEntity.profile = data.profile;
     userEntity.about = data.about ?? '';
     userEntity.identifier = data.identifier;
@@ -125,14 +131,6 @@ export class UserService {
     await this.userRepository.save(user);
   }
 
-  public async updateUserRating(_id: ObjectId, rating: number) {
-    const user = await this.findByIdOrFail(_id);
-
-    user.rate = user.rate ? (user.rate + rating) / 2 : rating;
-    await this.addOrdersCountToUser(user);
-    await this.userRepository.save(user);
-  }
-
   public async updateUserSafe(data: UserUpdateRequestDto) {
     const { user } = this.userAls.getStore();
 
@@ -149,6 +147,13 @@ export class UserService {
       ...result,
       pets: await this.petService.getPets(result)
     });
+  }
+
+  private async addRateToUser(user: UserEntity): Promise<Partial<UserDto>> {
+    const reviews = await this.reviewsService.getUserRate(user._id);
+
+    user['rate'] = reviews?.rate ?? 0;
+    return user;
   }
 
   private async addOrdersCountToUser(user: UserEntity) {

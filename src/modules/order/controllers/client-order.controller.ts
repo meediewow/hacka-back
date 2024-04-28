@@ -27,7 +27,7 @@ export class ClientOrderController {
     return this.orderService.changeClientStatus(body);
   }
 
-  @GuardGet([UserRole.Client])
+  @GuardGet([UserRole.Client], 'orders')
   @ApiResponse({ type: OrderResponseDto, isArray: true })
   public async getClientOrders() {
     return this.orderService.getClientOrders();

@@ -5,6 +5,7 @@ import { SessionModule } from '../session/session.module';
 import { PetModule } from '../pet/pet.module';
 import { OrderModule } from '../order/order.module';
 import { getEnvSafe } from '../../env';
+import { ReviewsModule } from '../reviews/reviews.module';
 
 import { UserService } from './services/user.service';
 import { UserController } from './controllers/user.controller';
@@ -27,7 +28,8 @@ import { UserSeed } from './seeds/user.seed';
     TypeOrmModule.forFeature([UserEntity]),
     SessionModule,
     PetModule,
-    forwardRef(() => OrderModule)
+    forwardRef(() => OrderModule),
+    forwardRef(() => ReviewsModule)
   ]
 })
 export class UserModule {}

@@ -1,6 +1,5 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
 import { Transform } from 'class-transformer';
 
 import { IUserUpdateData, UserRole } from '../types/user.types';
@@ -13,7 +12,7 @@ export class UserDto {
   @IsString()
   @ApiProperty({ type: 'string' })
   @Transform(({ value }) => String(value))
-  public _id: ObjectId;
+  public _id: UserEntity['_id'];
 
   @ApiProperty({ type: 'number', isArray: true })
   public roles: UserRole[];
@@ -36,11 +35,12 @@ export class UserDto {
   @ApiProperty({ type: 'string' })
   public about?: string;
 
-  constructor(data: UserEntity & { pets: PetResponseDto[] }) {
+  constructor(data: UserEntity & { pets: PetResponseDto[]; rate?: number }) {
     this._id = data._id;
     this.roles = data.roles;
     this.pets = data.pets;
     this.profile = data.profile;
+    this.rate = data.rate ?? 0;
   }
 
   static fromEntity(entity: UserEntity & { pets?: PetResponseDto[] }): UserDto {

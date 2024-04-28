@@ -27,9 +27,9 @@ export class SitterOrderController {
     return this.orderService.changeSitterStatus(body);
   }
 
-  @GuardGet([UserRole.Sitter])
+  @GuardGet([UserRole.Sitter], 'orders')
   @ApiResponse({ type: OrderResponseDto, isArray: true })
-  public async getClientOrders() {
+  public async getSitterOrders() {
     return this.orderService.getSitterOrders();
   }
 

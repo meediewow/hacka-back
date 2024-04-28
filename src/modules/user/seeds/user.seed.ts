@@ -24,7 +24,6 @@ export class UserSeed implements OnApplicationBootstrap {
   async seed(role: UserRole, count: number) {
     const user: Partial<UserEntity> = {
       roles: [role],
-      rate: 0,
       password: faker.internet.password(),
       identifier: faker.internet.email(),
       about: faker.lorem.sentence(),
