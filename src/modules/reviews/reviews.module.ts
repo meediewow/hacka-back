@@ -6,9 +6,10 @@ import { UserModule } from '../user/user.module';
 import { ReviewsService } from './reviews.service';
 import { ReviewEntity } from './entities/review.entity';
 import { ReviewsController } from './reviews.controller';
+import { ReviewSeed } from './seeds/review.seed';
 
 @Module({
-  providers: [ReviewsService],
+  providers: [ReviewsService, ReviewSeed],
   exports: [ReviewsService],
   controllers: [ReviewsController],
   imports: [
