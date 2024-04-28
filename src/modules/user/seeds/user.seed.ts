@@ -47,7 +47,7 @@ export class UserSeed implements OnApplicationBootstrap {
         },
         tariff: Object.keys(PetType).map((key) => ({
           category: PetType[key],
-          pricePerDay: faker.number.int()
+          pricePerDay: faker.number.int({ min: 0, max: 100 })
         })),
         communication: {
           phone: faker.phone.number()

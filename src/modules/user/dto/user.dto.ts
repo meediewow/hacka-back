@@ -31,20 +31,28 @@ export class UserDto {
   @ApiProperty({ type: 'number' })
   public rate: number;
 
+  @ApiProperty({ type: 'number', required: false })
+  price?: number;
+
   @IsString()
   @ApiProperty({ type: 'string' })
   public about?: string;
 
-  constructor(data: UserEntity & { pets: PetResponseDto[]; rate?: number }) {
+  constructor(
+    data: UserEntity & { pets: PetResponseDto[]; rate?: number; price?: number }
+  ) {
     this._id = data._id;
     this.roles = data.roles;
     this.pets = data.pets;
     this.profile = data.profile;
     this.rate = data.rate ?? 0;
     this.coordinates = data.location?.coordinates;
+    this.price = data.price;
   }
 
-  static fromEntity(entity: UserEntity & { pets?: PetResponseDto[] }): UserDto {
+  static fromEntity(
+    entity: UserEntity & { pets?: PetResponseDto[]; price?: number }
+  ): UserDto {
     return new UserDto({ ...entity, pets: entity.pets ?? [] });
   }
 }

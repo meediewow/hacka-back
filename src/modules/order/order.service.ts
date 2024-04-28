@@ -15,6 +15,8 @@ import { PetService } from '../pet/pet.service';
 import { UserDto } from '../user/dto';
 import { AlsService } from '../../als/als.service';
 import { UserRole } from '../user/types/user.types';
+import { PetType } from '../pet/enum/pet-type.enum';
+import { PeriodDto } from '../../network/dto/period.dto';
 
 import { OrderEntity } from './entities/order.entity';
 import { OrderRequestDto, OrderResponseDto } from './dto/order.dto';
@@ -224,9 +226,43 @@ export class OrderService {
       throw new BadRequestException('Sitter has no tariffs');
     }
 
+    const order = await this.orderRepository.save(
+      new OrderEntity({
+        ...rest,
+        startAt: dayStart.toJSDate(),
+        finishAt: dayEnd.toJSDate(),
+        clientId: client.user._id,
+        status: Status.NEW,
+        price: this.calculatePrice(
+          sitter,
+          pets.map((pet) => pet.type),
+          period
+        ),
+        isPayed: false
+      })
+    );
+    return {
+      ...order,
+      client: await this.userService.findUser({ id: order.clientId }),
+      sitter,
+      pets
+    };
+  }
+
+  calculatePrice(
+    sitter: Pick<UserEntity, 'profile'>,
+    petTypes: PetType[],
+    period?: PeriodDto
+  ): number {
+    if (!period) {
+      return 0;
+    }
+    const dayStart = DateTime.fromJSDate(period.start);
+    const dayEnd = DateTime.fromJSDate(period.end);
+
     const selectedTariffs =
       sitter.profile.tariff?.filter((tariff) =>
-        pets.find((pet) => pet.type === tariff.category)
+        petTypes.find((t) => t === tariff.category)
       ) ?? [];
 
     const dailyPrice = Number(
@@ -238,22 +274,6 @@ export class OrderService {
 
     const daysCount = dayEnd.diff(dayStart, 'days').days;
 
-    const order = await this.orderRepository.save(
-      new OrderEntity({
-        ...rest,
-        startAt: dayStart.toJSDate(),
-        finishAt: dayEnd.toJSDate(),
-        clientId: client.user._id,
-        status: Status.NEW,
-        price: dailyPrice * daysCount,
-        isPayed: false
-      })
-    );
-    return {
-      ...order,
-      client: await this.userService.findUser({ id: order.clientId }),
-      sitter,
-      pets
-    };
+    return dailyPrice * daysCount;
   }
 }
