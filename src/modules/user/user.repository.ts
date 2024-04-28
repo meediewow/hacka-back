@@ -149,7 +149,7 @@ export class UserRepository extends MongoRepository<UserEntity> {
       },
       {
         $project: {
-          user_id: 1,
+          userId: 1,
           orders: 1
         }
       }

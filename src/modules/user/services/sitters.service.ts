@@ -11,6 +11,7 @@ export class SittersService {
 
   public async getSittersList(args: SittersRequestDto): Promise<UserDto[]> {
     const users = await this.userRepository.getSittersList(args);
+    // TODO: add price calculation
     return users.map(UserDto.fromEntity);
   }
 }
