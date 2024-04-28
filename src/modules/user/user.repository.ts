@@ -50,7 +50,7 @@ export class UserRepository extends MongoRepository<UserEntity> {
       },
       {
         $addFields: {
-          'profile.orderCount': { $size: '$allOrders' }
+          'profile.ordersCount': { $size: '$allOrders' }
         }
       }
     ];

@@ -45,7 +45,7 @@ export class ReviewSeed implements OnApplicationBootstrap {
       .aggregate([
         {
           $match: {
-            roles: { $in: [UserRole.Client] }
+            roles: { $in: [UserRole.Sitter] }
           }
         },
         { $sample: { size: 1 } }
