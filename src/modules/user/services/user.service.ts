@@ -151,7 +151,7 @@ export class UserService {
   }
 
   private async isUserExists(data: IFindUserData) {
-    const user = await this.findUser(data);
+    const user = await this.userRepository.count(data);
     return !!user;
   }
 }
