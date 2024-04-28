@@ -147,7 +147,11 @@ export class OrderService {
       order.status
     ]?.includes(args.status);
 
-    if (!order.sitterId.equals(sitter._id) || !isSelectedCorrectStatus) {
+    if (!isSelectedCorrectStatus) {
+      throw new BadRequestException('Invalid status');
+    }
+
+    if (!order.sitterId.equals(sitter._id)) {
       throw new ForbiddenException();
     }
 

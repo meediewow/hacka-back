@@ -1,6 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { ObjectId } from 'mongodb';
 import { IsEnum, IsObject } from 'class-validator';
 
 import { OrderEntity } from '../entities/order.entity';
@@ -14,8 +12,7 @@ export class ChangeOrderStatusRequestDto
 {
   @IsObject()
   @ApiProperty({ type: 'string', example: '616f9b3b8f4b3b001f3b3b3b' })
-  @Transform(({ value }) => ObjectId.createFromHexString(value))
-  orderId: ObjectId;
+  orderId: OrderEntity['_id'];
 
   @ApiProperty({ type: 'number', example: '1' })
   @IsEnum(Status)
