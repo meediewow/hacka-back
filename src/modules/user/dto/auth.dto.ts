@@ -37,6 +37,7 @@ export class RegisterRequestDto extends AuthRequestDto {
 
   @IsString()
   @ApiProperty({ type: 'string', example: 'about me' })
+  @IsOptional()
   public about?: string;
 
   @ApiProperty({ type: 'number', required: false, isArray: true })

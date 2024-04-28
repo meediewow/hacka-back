@@ -19,10 +19,12 @@ export class UserRepository extends MongoRepository<UserEntity> {
 
   getSittersList(args: SittersRequestDto) {
     return this.aggregate([
-      ...(args?.period ? this.getPeriodAggregation(args.period) : []),
-      ...(args?.category ? this.getPetTypesAggregation(args.category) : []),
-      ...(args?.coordinates
+      ...(args?.coordinates?.length
         ? this.getCoordinatesAggregation(args.coordinates)
+        : []),
+      ...(args?.period ? this.getPeriodAggregation(args.period) : []),
+      ...(args?.category?.length
+        ? this.getPetTypesAggregation(args.category)
         : []),
       ...this.getOrdersCountAggregation(),
       ...(args?.sorter ? [{ $sort: args.sorter.toOrder() }] : [])

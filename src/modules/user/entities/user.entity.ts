@@ -30,7 +30,6 @@ export class UserEntity implements IUser {
     srid: 4326,
     nullable: true
   })
-  @Index({ spatial: true })
   public location: {
     type: 'Point';
     coordinates: number[];
