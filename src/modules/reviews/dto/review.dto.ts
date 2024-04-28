@@ -3,6 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNumber, IsObject, IsString } from 'class-validator';
 
+import { UserEntity } from '../../user/entities';
+
 export class ReviewDto {
   @IsString()
   @ApiProperty({ type: 'string', required: true })
@@ -46,7 +48,7 @@ export class AddReviewRequestDto {
   @IsObject()
   @ApiProperty({ type: 'string', required: true })
   @Transform(({ value }) => ObjectId.createFromHexString(value))
-  target: ObjectId;
+  targetId: UserEntity['_id'];
 
   @IsString()
   @ApiProperty({ type: 'string', required: true })

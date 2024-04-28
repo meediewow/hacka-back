@@ -1,29 +1,37 @@
 import { ObjectId } from 'mongodb';
-import { Column, Entity, Index, ObjectIdColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ObjectIdColumn
+} from 'typeorm';
 
-import { ReviewDto } from '../dto/review.dto';
+import { UserEntity } from '../../user/entities';
 
 @Entity()
-export class ReviewEntity implements ReviewDto {
+export class ReviewEntity {
   @ObjectIdColumn()
   _id: ObjectId;
 
   @Column()
-  name: string;
-
-  @Column()
-  photo: string;
+  @Index()
+  creatorId: UserEntity['_id'];
 
   @Column()
   text: string;
-
-  @Column()
-  date: string;
 
   @Column()
   rate: number;
 
   @Column()
   @Index()
-  target: ObjectId;
+  recipientId: UserEntity['_id'];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  constructor(data: Omit<ReviewEntity, '_id' | 'createdAt'>) {
+    Object.assign(this, data);
+  }
 }
