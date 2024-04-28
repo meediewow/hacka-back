@@ -4,6 +4,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 
 import { PeriodDto } from '../../network/dto/period.dto';
 import { PetType } from '../pet/enum/pet-type.enum';
+import { Status } from '../order/enums/status.enum';
 
 import { UserEntity } from './entities';
 import { SittersRequestDto } from './dto/sitters.dto';
@@ -140,9 +141,16 @@ export class UserRepository extends MongoRepository<UserEntity> {
               input: '$orders',
               as: 'order',
               cond: {
-                $or: [
-                  { $lt: ['$$order.finishAt', period.start] },
-                  { $gt: ['$$order.startAt', period.end] }
+                $and: [
+                  {
+                    $or: [
+                      { $lt: ['$$order.finishAt', period.start] },
+                      { $gt: ['$$order.startAt', period.end] }
+                    ]
+                  },
+                  {
+                    $in: ['$$order.status', [Status.PROGRESS, Status.CONFIRMED]]
+                  }
                 ]
               }
             }
