@@ -20,10 +20,10 @@ export class ReviewSeed implements OnApplicationBootstrap {
   private userRepository: UserRepository;
 
   async onApplicationBootstrap(): Promise<void> {
-    // await this.seed(faker.number.int({ min: 3, max: 10 }));
+    // await this.seed();
   }
 
-  async seed(count: number): Promise<void> {
+  async seed(): Promise<void> {
     const client = await this.userRepository
       .aggregate([
         {
@@ -60,7 +60,10 @@ export class ReviewSeed implements OnApplicationBootstrap {
         targetId: sitter._id
       });
 
-      const data = Array.from({ length: count }, getReview);
+      const data = Array.from(
+        { length: faker.number.int({ min: 1, max: 4 }) },
+        getReview
+      );
       result = result.concat(data);
     }
 
