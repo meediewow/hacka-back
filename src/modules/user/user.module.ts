@@ -23,7 +23,7 @@ import { UserSeed } from './seeds/user.seed';
     ...(getEnvSafe('NODE_ENV') === 'development' ? [UserSeed] : [])
   ],
   controllers: [UserController, SittersController],
-  exports: [UserService],
+  exports: [UserService, UserRepository],
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
     SessionModule,

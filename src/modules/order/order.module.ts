@@ -9,6 +9,7 @@ import { OrderService } from './order.service';
 import { SitterOrderController } from './controllers/sitter-order.controller';
 import { ClientOrderController } from './controllers/client-order.controller';
 import { OrderRepository } from './order.repository';
+import { OrderSeed } from './seeds/order.seed';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { OrderRepository } from './order.repository';
     forwardRef(() => UserModule),
     PetModule
   ],
-  providers: [OrderService, OrderRepository],
+  providers: [OrderService, OrderRepository, OrderSeed],
   controllers: [SitterOrderController, ClientOrderController],
   exports: [OrderService]
 })

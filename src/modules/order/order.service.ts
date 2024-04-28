@@ -214,7 +214,7 @@ export class OrderService {
       throw new NotFoundException('Some pets not found');
     }
 
-    if (sitter.profile?.tariff?.length ?? 0 < 1) {
+    if ((sitter.profile.tariff?.length ?? 0) < 1) {
       throw new BadRequestException('Sitter has no tariffs');
     }
 
