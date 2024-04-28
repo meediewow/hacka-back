@@ -45,7 +45,7 @@ export class UserDto {
     this.roles = data.roles;
     this.pets = data.pets;
     this.profile = data.profile;
-    this.rate = data.rate ?? 0;
+    this.rate = Number(data.rate?.toFixed(1) ?? 0);
     this.coordinates = data.location?.coordinates;
     this.price = data.price;
   }
