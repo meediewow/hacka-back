@@ -115,6 +115,12 @@ export class UserService {
     userEntity.identifier = data.identifier;
     userEntity.roles = [data.role ?? UserRole.Client];
     userEntity.password = passwordHash;
+    userEntity.location = data.coordinates
+      ? {
+          type: 'Point',
+          coordinates: data.coordinates
+        }
+      : null;
 
     const savedUser = await this.userRepository.save(userEntity);
 
